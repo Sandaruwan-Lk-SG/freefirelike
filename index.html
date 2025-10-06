@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="si">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire ID Finder</title>
+    <title>Free Fire Player Data Finder</title>
     <style>
-        /* CSS හැඩතල ගැන්වීම */
+        /* CSS Styling */
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
             padding: 20px; 
             background-color: #f0f2f5; 
             color: #333;
@@ -23,17 +23,23 @@
             padding: 30px; 
             background: #ffffff; 
             border-radius: 12px; 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
+            text-align: center;
         }
         h1 {
             color: #d9534f; 
-            text-align: center;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #555;
             margin-bottom: 25px;
+            font-size: 0.95em;
         }
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
+            text-align: left;
         }
         input[type="text"], select { 
             width: 100%; 
@@ -42,6 +48,11 @@
             box-sizing: border-box; 
             border: 2px solid #ccc; 
             border-radius: 6px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #d9534f;
+            outline: none;
         }
         button { 
             width: 100%; 
@@ -63,7 +74,20 @@
             cursor: not-allowed;
             opacity: 0.8;
         }
-        /* ප්‍රතිඵල පෙට්ටිය සඳහා විශේෂ CSS (Text Art) */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #d9534f;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; /* Initially hidden */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         #result { 
             margin-top: 30px; 
             padding: 15px; 
@@ -76,6 +100,7 @@
             overflow-x: auto;
             font-family: 'Courier New', Courier, monospace; 
             line-height: 1.3;
+            text-align: left;
         }
         .error {
             color: #c9302c;
@@ -83,6 +108,14 @@
             background-color: #fff0f0;
             white-space: normal; /* Error messages wrap */
             font-family: Arial, sans-serif;
+            padding: 15px;
+            border: 1px solid #c9302c;
+            border-radius: 6px;
+        }
+        footer {
+            margin-top: 25px;
+            font-size: 0.8em;
+            color: #888;
         }
     </style>
 </head>
@@ -90,11 +123,12 @@
 
 <div class="container">
     <h1>Free Fire Player Data Finder</h1>
+    <p class="description">Enter a player's UID and select their region to fetch game data and potentially give likes.</p>
+    
     <form id="dataForm">
-        
-        <label for="region">Region තෝරන්න:</label>
+        <label for="region">Select Region:</label>
         <select id="region" name="region" required>
-            <option value="">-- Region තෝරන්න --</option>
+            <option value="">-- Select a Region --</option>
             <option value="sg">Singapore (sg)</option>
             <option value="in">India (in)</option>
             <option value="id">Indonesia (id)</option>
@@ -102,21 +136,37 @@
             <option value="na">North America (na)</option>
         </select>
 
-        <label for="uid">Game ID (UID) ඇතුළත් කරන්න:</label>
-        <input type="text" id="uid" name="uid" placeholder="Game ID (උදා: 12345678)" required>
+        <label for="uid">Enter Game ID (UID):</label>
+        <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
 
-        <button type="submit" id="submitBtn">දත්ත ලබා ගන්න</button>
+        <button type="submit" id="submitBtn">Get Player Data</button>
     </form>
 
-    <h2>ප්‍රතිචාරය</h2>
-    <div id="result">ප්‍රතිචාරය මෙහි දිස්වනු ඇත...</div>
+    <div class="loader" id="loader"></div>
+    <div id="result">The response will be displayed here...</div>
+    
+    <footer>
+        Developed by Sandaruwan Jayalath
+    </footer>
 </div>
 
 <script>
-    // ⚠️ අත්‍යවශ්‍යයි: ඔබේ සජීවී Railway Server URL එක මෙහි ඇතුළත් කරන්න!
+    // ⚠️ IMPORTANT: Enter your live Railway Server URL here!
     const backendUrl = 'https://freefirewebbackend-production.up.railway.app/api/get-likes'; 
     
-    // 💡 දෝෂ පණිවිඩ හඳුනාගෙන Friendly Message එකක් සපයන ශ්‍රිතය
+    // --- DOM Elements ---
+    const dataForm = document.getElementById('dataForm');
+    const regionSelect = document.getElementById('region');
+    const uidInput = document.getElementById('uid');
+    const resultDiv = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+    const loader = document.getElementById('loader');
+
+    /**
+     * Translates raw error messages from the API into user-friendly explanations.
+     * @param {string} errorMessage - The raw error string from the backend.
+     * @returns {string} A user-friendly error message.
+     */
     function handleErrorResponse(errorMessage) {
         const errorText = String(errorMessage).toLowerCase();
 
@@ -136,14 +186,19 @@
             return "SERVER ERROR: The internal API Key is missing. Please contact the site administrator.";
         }
         
+        // Default case for any other errors
         return `UNKNOWN ERROR: An unexpected issue occurred. Raw message: "${errorMessage}"`;
     }
 
-    // 💡 ලැබුණු JSON දත්ත, ඔබ ඉල්ලූ ASCII Art ආකෘතියට පරිවර්තනය කරන ශ්‍රිතය
+    /**
+     * Formats the successful JSON response into a text art string.
+     * @param {object} data - The successful data object from the backend.
+     * @returns {string} The formatted text art string.
+     */
     function formatResponseToTextArt(data) {
         const res = data.response;
         
-        // දත්ත නිවැරදිව ලබා ගැනීම (නැතිනම් 'N/A' පෙන්වයි)
+        // Safely access properties, providing 'N/A' as a fallback.
         const nickname = res.PlayerNickname || 'N/A';
         const uid = res.UID || 'N/A';
         const level = res.PlayerLevel || 'N/A';
@@ -151,10 +206,10 @@
         const likesAfter = res.LikesafterCommand || 0;
         const likesGiven = res.LikesGivenByAPI || 0;
         
-        // Text Art ආකෘතිය නිර්මාණය කිරීම
+        // The Text Art template
         const textArt = 
 `╭────✧ FF LIKES ✧────◆
-┃❃┃         Free likes     ┃❃┃
+┃❃┃      Player Data     ┃❃┃
 ☉────────────────────⁠☉
 ├─❒ Name: ${nickname}
 ├─❒ UID: ${uid}
@@ -164,31 +219,30 @@
 ├─❒ Given: 👍🏻 ${likesGiven}
 ☉────────────────────⁠☉
 > Not For Resale
-Copyright by Sandaruwan Jayalath  ©️
+Copyright by Sandaruwan Jayalath ©️
 
 ╰────✧Sri Lanka✧────◆`;
         
         return textArt;
     }
 
+    // --- Main Logic ---
+    dataForm.addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission
 
-    document.getElementById('dataForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); 
+        const region = regionSelect.value;
+        const uid = uidInput.value;
 
-        const region = document.getElementById('region').value;
-        const uid = document.getElementById('uid').value;
-        const resultDiv = document.getElementById('result');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // Client-side Validation
+        // Client-side validation
         if (uid.length < 5 || !/^\d+$/.test(uid)) {
-            resultDiv.innerHTML = '<span class="error">ERROR: Invalid Player ID (UID). UID must be a number with at least 5 digits.</span>';
-            submitBtn.disabled = false;
+            resultDiv.innerHTML = '<div class="error">ERROR: Invalid Player ID (UID). UID must be a number with at least 5 digits.</div>';
             return;
         }
 
-        resultDiv.innerHTML = 'ඉල්ලීම යවමින්... කරුණාකර රැදී සිටින්න.';
+        // --- Set Loading State ---
         submitBtn.disabled = true;
+        resultDiv.style.display = 'none'; // Hide previous results
+        loader.style.display = 'block';   // Show spinner
 
         try {
             const response = await fetch(backendUrl, {
@@ -201,32 +255,36 @@ Copyright by Sandaruwan Jayalath  ©️
 
             const data = await response.json();
             
-            // 💡 සාර්ථක ප්‍රතිචාරය (status === 1)
-            if (response.status === 200 && data.status === 1) {
+            // Case 1: Successful response (status code 200 and API status 1)
+            if (response.ok && data.status === 1) {
                 const formattedOutput = formatResponseToTextArt(data);
-                resultDiv.textContent = formattedOutput;
+                resultDiv.textContent = formattedOutput; // Use textContent for pre-formatted text to prevent HTML injection
+                resultDiv.className = ''; // Remove error class if it exists
             } 
-            // 💡 දෝෂ සහිත ප්‍රතිචාරය (අපේ Backend එකෙන් හෝ Free Fire API එකෙන්)
+            // Case 2: Error response from our backend or the FF API
             else {
-                 let rawErrorMessage = 'Unknown error occurred.';
+                 let rawErrorMessage = 'An unknown error occurred.';
                  
-                 if (data.error) { // අපේ Backend Server එකෙන් එන දෝෂ
+                 if (data.error) { // Error from our backend server
                      rawErrorMessage = data.error;
-                 } else if (data.status === 0 && data.message) { // Free Fire API වෙතින් ආ දෝෂයක්
+                 } else if (data.message) { // Error message from the Free Fire API proxy
                      rawErrorMessage = data.message;
                  } else { 
-                     rawErrorMessage = JSON.stringify(data);
+                     rawErrorMessage = JSON.stringify(data); // Fallback
                  }
                  
                  const userFriendlyMessage = handleErrorResponse(rawErrorMessage);
-                 resultDiv.innerHTML = `<span class="error">${userFriendlyMessage}</span>`;
+                 resultDiv.innerHTML = `<div class="error">${userFriendlyMessage}</div>`;
             }
 
         } catch (error) {
-            console.error('ඉල්ලීම යැවීමේ දෝෂය:', error);
-            resultDiv.innerHTML = '<span class="error">NETWORK ERROR: Could not connect to the proxy server. Please check your internet connection or contact the administrator.</span>';
+            console.error('Error sending request:', error);
+            resultDiv.innerHTML = '<div class="error">NETWORK ERROR: Could not connect to the server. Please check your internet connection or contact the administrator.</div>';
         } finally {
-            submitBtn.disabled = false;
+            // --- Reset UI State ---
+            loader.style.display = 'none'; // Hide spinner
+            resultDiv.style.display = 'block'; // Show the result div again
+            submitBtn.disabled = false; // Re-enable the button
         }
     });
 </script>
