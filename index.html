@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Likes System - User Auth</title>
+    <title>Free Fire Likes System - Premium Access</title>
     <style>
         /* Base Styling */
         body { 
@@ -34,7 +34,7 @@
         #nav-tabs button {
             background-color: #ccc;
             color: #333;
-            width: 30%; /* Three tabs fit better */
+            width: 30%; 
             margin: 0 1%;
             padding: 10px;
             border: none;
@@ -43,10 +43,7 @@
             font-weight: bold;
             transition: background-color 0.2s;
         }
-        .nav-active {
-            background-color: #d9534f !important;
-            color: white !important;
-        }
+        .nav-active { background-color: #d9534f !important; color: white !important; }
 
         /* Inputs and Buttons */
         input[type="text"], input[type="password"], select { 
@@ -61,21 +58,29 @@
         .secondary-btn { background-color: #5cb85c; }
         .secondary-btn:hover { background-color: #449d44; }
 
-        /* General Messages */
-        .message-box { padding: 10px; margin-top: 10px; border-radius: 6px; font-weight: bold; }
-        .success-msg { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error-msg { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-
-        /* Premium & Tool Specific Styling */
+        /* Status and Messages */
         #user-status { margin-bottom: 15px; font-weight: bold; }
         .user-status-text { color: #007bff; }
         .user-premium-text { color: #ff4d4d; }
+        .message-box { padding: 10px; margin-top: 10px; border-radius: 6px; font-weight: bold; display: none;}
+        .success-msg { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-msg { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Premium Section Styles */
         .package-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 6px; cursor: pointer; text-align: left; }
         .package-card.selected { background-color: #f0f0f0; border-color: #d9534f; border-width: 2px; }
-        
+        .payment-info-box { padding: 15px; border: 1px solid #bce8f1; background-color: #d9edf7; border-radius: 6px; text-align: left; color: #31708f; margin-top: 10px;}
+        .payment-details p { color: #555; font-size: 0.95em; line-height: 1.5;}
+
         /* Text Art Output */
-        #result { white-space: pre; background-color: #222; color: #00ff00; border: 1px solid #d9534f; }
-        .error-box { background-color: #f8d7da; border: 1px solid #f5c6cb; }
+        #result { 
+            white-space: pre; background-color: #222; color: #00ff00; border: 1px solid #d9534f; 
+            padding: 15px; border-radius: 6px; font-size: 0.9em; overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace; line-height: 1.25; 
+            text-align: left;
+        }
+        .error-box { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px;}
+        .error-box .error-text { color: #721c24; font-weight: bold; font-family: Arial, sans-serif; display: block; }
     </style>
 </head>
 <body>
@@ -97,7 +102,7 @@
 
     <div id="auth-section" style="display: none;">
         <h2>User Authentication</h2>
-        <div id="auth-message" class="message-box" style="display:none;"></div>
+        <div id="auth-message" class="message-box"></div>
 
         <div id="login-form">
             <h3>Login</h3>
@@ -147,6 +152,7 @@
     </div>
     
     <div id="premium-section" style="display: none;">
+        
         <div id="package-list">
             <h2>Select a Premium Plan</h2>
             <div id="package-cards-container">
@@ -155,13 +161,36 @@
 
         <div id="payment-view" style="display: none;">
             <h2>Payment Instructions</h2>
+            
             <div class="payment-info-box">
                 <p><strong>Selected Plan:</strong> <span id="selected-plan">N/A</span></p>
                 <p><strong>Price:</strong> <span id="selected-price">N/A</span></p>
             </div>
             
             <div class="payment-details">
+                <h3 style="color:#d9534f; margin-top:15px;">Local Payment Methods (LKR)</h3>
+                <p><strong>1. Ez Cash:</strong> 0762332957</p>
+                
+                <h4 style="margin-top:10px;">2. Bank Transfer (Commercial Bank)</h4>
+                <p><strong>Account Name:</strong> WOS JAYALATH</p>
+                <p><strong>Account Number:</strong> 8012396005</p>
+                <p><strong>Branch:</strong> Head Office Branch</p>
+                <p style="margin-top:10px;"><strong>3. Dialog Finance Plc:</strong> 001020027802</p>
+
+                <h3 style="color:#d9534f; margin-top:15px;">International Users (Crypto)</h3>
+                <div class="crypto-note">
+                    <p>Note: 305 LKR ≈ 1 USDT</p>
+                    <p><strong>Bybit ID:</strong> 133761830</p>
+                    <p><strong>Binance ID:</strong> 473713483</p>
                 </div>
+                
+                <p style="color: #d9534f; font-weight: bold; margin-top: 20px;">
+                    ⚠️ ACTION REQUIRED: After payment, contact the Admin with proof to receive your unique Premium Code.
+                </p>
+                <p style="font-size: 0.8em; color: #777;">
+                    * Half Payment is fully refundable.
+                </p>
+            </div>
             <button onclick="showSection('package-selection')" class="secondary-btn">← Back to Packages</button>
         </div>
 
@@ -169,7 +198,7 @@
             <h2>Activate Your Plan</h2>
             <p style="color: #555; font-size: 0.95em; margin-bottom: 10px;">Enter the Premium Code received from the Admin after payment.</p>
             <input type="text" id="premium-code-input" placeholder="Enter your Premium Code">
-            <button id="redeem-btn" onclick="redeemCode()" class="action-button">Activate Plan</button>
+            <button id="redeem-btn" onclick="redeemCode()" class="action-button secondary-btn">Activate Plan</button>
             <p id="redemption-status" style="margin-top: 10px;"></p>
         </div>
 
@@ -180,20 +209,33 @@
 </div>
 
 <script>
-    // --- Configuration ---
+    // --- Configuration (Update these URLs!) ---
     const BASE_URL = 'https://freefirewebbackend-production.up.railway.app';
     const LOGIN_API = `${BASE_URL}/api/login`;
     const REGISTER_API = `${BASE_URL}/api/register`;
     const LIKES_API = `${BASE_URL}/api/get-likes`;
     const REDEEM_API = `${BASE_URL}/api/redeem`;
-    const USER_INFO_API = `${BASE_URL}/api/user-info`; // We need this new API endpoint
+    const USER_INFO_API = `${BASE_URL}/api/user-info`; 
 
-    // Defined packages (same as before)
+    // Defined packages (Full List)
     const PACKAGES = [
-        { id: 101, requests: 2, price: 50, duration: '7 days', type: 'WEEKLY' },
-        // ... (All other 22 packages here) ...
-        { id: 212, requests: 100, price: 8500, duration: '30 days', type: 'MONTHLY' },
+        // Weekly Packages (7 days)
+        { id: 101, requests: 2, price: 50, duration: '7 days', type: 'WEEKLY' }, { id: 102, requests: 5, price: 125, duration: '7 days', type: 'WEEKLY' },
+        { id: 103, requests: 10, price: 250, duration: '7 days', type: 'WEEKLY' }, { id: 104, requests: 20, price: 500, duration: '7 days', type: 'WEEKLY' },
+        { id: 105, requests: 30, price: 750, duration: '7 days', type: 'WEEKLY' }, { id: 106, requests: 40, price: 1000, duration: '7 days', type: 'WEEKLY' },
+        { id: 107, requests: 50, price: 1250, duration: '7 days', type: 'WEEKLY' }, { id: 108, requests: 60, price: 1500, duration: '7 days', type: 'WEEKLY' },
+        { id: 109, requests: 70, price: 1750, duration: '7 days', type: 'WEEKLY' }, { id: 110, requests: 80, price: 2000, duration: '7 days', type: 'WEEKLY' },
+        { id: 111, requests: 90, price: 2250, duration: '7 days', type: 'WEEKLY' }, { id: 112, requests: 100, price: 2500, duration: '7 days', type: 'WEEKLY' },
+        // Monthly Packages (30 days)
+        { id: 201, requests: 2, price: 170, duration: '30 days', type: 'MONTHLY' }, { id: 202, requests: 5, price: 425, duration: '30 days', type: 'MONTHLY' },
+        { id: 203, requests: 10, price: 850, duration: '30 days', type: 'MONTHLY' }, { id: 204, requests: 20, price: 1700, duration: '30 days', type: 'MONTHLY' },
+        { id: 205, requests: 30, price: 2550, duration: '30 days', type: 'MONTHLY' }, { id: 206, requests: 40, price: 3400, duration: '30 days', type: 'MONTHLY' },
+        { id: 207, requests: 50, price: 4250, duration: '30 days', type: 'MONTHLY' }, { id: 208, requests: 60, price: 5100, duration: '30 days', type: 'MONTHLY' },
+        { id: 209, requests: 70, price: 5950, duration: '30 days', type: 'MONTHLY' }, { id: 210, requests: 80, price: 6800, duration: '30 days', type: 'MONTHLY' },
+        { id: 211, requests: 90, price: 7650, duration: '30 days', type: 'MONTHLY' }, { id: 212, requests: 100, price: 8500, duration: '30 days', type: 'MONTHLY' },
     ];
+
+    let selectedPackage = null;
     
     // --- UTILITIES AND UI MANAGEMENT ---
 
@@ -207,19 +249,65 @@
         el.className = `message-box ${isSuccess ? 'success-msg' : 'error-msg'}`;
         el.style.display = 'block';
     }
+    
+    // Renders the correct section based on tab click
+    function showSection(sectionId) {
+        // Hide all major sections
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('tool-section').style.display = 'none';
+        document.getElementById('premium-section').style.display = 'none';
+        document.getElementById('payment-view').style.display = 'none';
+        document.getElementById('package-list').style.display = 'none';
 
-    function updateNavAndStatus(username = null, isPremium = false, maxRequests = 1) {
+        // Reset nav bar highlighting
+        document.getElementById('tab-auth').classList.remove('nav-active');
+        document.getElementById('tab-tool').classList.remove('nav-active');
+        document.getElementById('tab-premium').classList.remove('nav-active');
+
+        if (sectionId === 'auth') {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('tab-auth').classList.add('nav-active');
+            toggleAuthView('login');
+        } 
+        else if (sectionId === 'tool') {
+            document.getElementById('tool-section').style.display = 'block';
+            document.getElementById('tab-tool').classList.add('nav-active');
+        } 
+        else if (sectionId === 'premium' || sectionId === 'package-selection' || sectionId === 'payment-view') {
+            document.getElementById('premium-section').style.display = 'block';
+            document.getElementById('tab-premium').classList.add('nav-active');
+            
+            if (sectionId === 'package-selection' || sectionId === 'premium') {
+                document.getElementById('package-list').style.display = 'block';
+            } else if (sectionId === 'payment-view') {
+                document.getElementById('payment-view').style.display = 'block';
+            }
+        }
+    }
+    
+    // Toggles between Login and Register forms
+    function toggleAuthView(view) {
+        document.getElementById('login-form').style.display = (view === 'login' ? 'block' : 'none');
+        document.getElementById('register-form').style.display = (view === 'register' ? 'block' : 'none');
+        document.getElementById('auth-message').style.display = 'none';
+    }
+
+
+    async function updateNavAndStatus(user) {
         const token = getAuthToken();
         const authStatus = document.getElementById('auth-status');
         const planStatus = document.getElementById('plan-status');
         const logoutBtn = document.getElementById('logout-btn');
 
-        if (token && username) {
-            authStatus.textContent = `Logged in as ${username}`;
+        if (token && user) {
+            authStatus.textContent = `Logged in as ${user.username}`;
             authStatus.classList.remove('user-status-text');
             authStatus.classList.add('user-premium-text');
             
-            planStatus.textContent = `${isPremium ? 'PREMIUM' : 'FREE'} (${maxRequests}/day)`;
+            const isPremium = user.isPremium && new Date(user.premiumExpiry) > new Date();
+            const planText = isPremium ? `PREMIUM (${user.maxRequestsPerDay}/day)` : `FREE (${user.maxRequestsPerDay}/day)`;
+            
+            planStatus.textContent = planText;
             logoutBtn.style.display = 'block';
         } else {
             authStatus.textContent = 'Logged Out';
@@ -229,43 +317,37 @@
         }
     }
 
-    // Function to fetch user status from the backend (Required for persistent login)
+    // Fetches user status from the backend (Required for persistent login)
     async function fetchUserInfo() {
         const token = getAuthToken();
-        if (!token) return;
+        if (!token) {
+             updateNavAndStatus(null);
+             document.getElementById('logout-btn').style.display = 'none';
+             return;
+        }
 
         try {
             const response = await fetch(USER_INFO_API, {
                 method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
             
             if (response.ok) {
-                // Update UI with latest status
-                updateNavAndStatus(data.username, data.isPremium, data.maxRequestsPerDay);
-                // Redirect user from auth page if they are logged in
-                if (document.getElementById('auth-section').style.display !== 'none') {
-                     showSection('tool');
-                }
+                updateNavAndStatus(data);
+                return data;
             } else {
-                // Token expired or invalid
                 localStorage.removeItem('jwtToken');
                 updateNavAndStatus(null);
             }
         } catch (error) {
             console.error("Failed to fetch user info:", error);
+            localStorage.removeItem('jwtToken');
         }
+        return null;
     }
 
     // --- AUTHENTICATION HANDLERS ---
-
-    function toggleAuthView(view) {
-        document.getElementById('login-form').style.display = (view === 'login' ? 'block' : 'none');
-        document.getElementById('register-form').style.display = (view === 'register' ? 'block' : 'none');
-    }
 
     async function handleAuth(event, endpoint) {
         event.preventDefault();
@@ -289,8 +371,8 @@
                 localStorage.setItem('jwtToken', data.token);
                 showMessage(msgId, data.message + ' Redirecting...', true);
                 
-                // Fetch user details to update status
                 await fetchUserInfo(); 
+                showSection('tool'); // Redirect to tool after login
             } else {
                 showMessage(msgId, data.message || 'Authentication failed.', false);
             }
@@ -306,46 +388,203 @@
         showMessage('auth-message', 'Logged out successfully.', true);
     }
     
-    // --- API TOOL AND PREMIUM HANDLERS (Simplified) ---
+    // --- PACKAGE AND REDEMPTION LOGIC ---
 
-    // ... (formatResponseToTextArt and handleErrorResponse remain the same) ...
-
-    document.getElementById('loginForm').addEventListener('submit', (e) => handleAuth(e, LOGIN_API));
-    document.getElementById('registerForm').addEventListener('submit', (e) => handleAuth(e, REGISTER_API));
-
-
-    document.getElementById('dataForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
+    function renderPackages() {
+        const listContainer = document.getElementById('package-cards-container');
+        listContainer.innerHTML = '';
         
+        const weekly = PACKAGES.filter(p => p.type === 'WEEKLY');
+        const monthly = PACKAGES.filter(p => p.type === 'MONTHLY');
+
+        const createSection = (title, pkgs) => {
+             const titleElement = document.createElement('h4');
+             titleElement.textContent = title;
+             titleElement.style.marginTop = '15px';
+             listContainer.appendChild(titleElement);
+             
+             pkgs.forEach((pkg) => {
+                const card = document.createElement('div');
+                card.className = 'package-card';
+                card.innerHTML = `
+                    <p style="font-size: 1.1em; color: #333;"><strong>${pkg.requests} Requests / Day</strong></p>
+                    <p style="color: #d9534f; margin-top: 5px;">Price: <strong>${pkg.price} LKR</strong> / ${pkg.duration}</p>
+                `;
+                card.onclick = () => selectPackage(pkg.id);
+                listContainer.appendChild(card);
+             });
+        };
+        
+        createSection('Weekly Plans', weekly);
+        createSection('Monthly Plans', monthly);
+    }
+
+    function selectPackage(pkgId) {
+        document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+        selectedPackage = PACKAGES.find(pkg => pkg.id === pkgId);
+        
+        if (selectedPackage) {
+            const allCards = document.querySelectorAll('.package-card');
+            for(let card of allCards) {
+                if (card.innerHTML.includes('Requests / Day') && card.innerHTML.includes(selectedPackage.price + ' LKR')) {
+                    card.classList.add('selected');
+                    break;
+                }
+            }
+            
+            document.getElementById('selected-plan').textContent = `${selectedPackage.requests} Requests / Day (${selectedPackage.duration})`;
+            document.getElementById('selected-price').textContent = `${selectedPackage.price} LKR`;
+            showSection('payment-view');
+        }
+    }
+    
+    async function redeemCode() {
+        const code = document.getElementById('premium-code-input').value.trim();
+        const statusElement = document.getElementById('redemption-status');
         const token = getAuthToken();
+
         if (!token) {
-            document.getElementById('result').innerHTML = '<div class="error-box"><span class="error-text">ERROR: You must be logged in to use this service.</span></div>';
-            showSection('auth');
+            statusElement.innerHTML = '<span class="error-msg">You must be logged in to redeem a code.</span>';
             return;
         }
 
-        // --- Execute Likes Command Logic (Requires Token in Header) ---
-        // ... (Existing validation logic) ...
-        // ... (Existing try-catch block for fetching LIKES_API) ...
+        if (!code) {
+            statusElement.innerHTML = '<span class="error-msg">Please enter the code provided by the Admin.</span>';
+            return;
+        }
+
+        statusElement.innerHTML = '<span class="success-msg" style="color:#007bff; background:white;">Processing activation...</span>';
+
+        try {
+             const response = await fetch(REDEEM_API, {
+                 method: 'POST',
+                 headers: { 
+                     'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}` 
+                 },
+                 body: JSON.stringify({ code: code })
+             });
+             
+             const result = await response.json();
+             
+             if (response.ok && result.success) {
+                 statusElement.innerHTML = `<span class="success-msg">✅ Success! Plan active for ${result.duration}. Limit: ${result.requests} commands/day.</span>`;
+                 await fetchUserInfo(); // Update nav status
+             } else {
+                 statusElement.innerHTML = `<span class="error-msg">❌ Activation Failed: ${result.message || 'Invalid or expired code.'}</span>`;
+             }
+
+        } catch (error) {
+             statusElement.innerHTML = '<span class="error-msg">NETWORK ERROR: Could not connect to the activation server.</span>';
+        }
+    }
+
+
+    // ---------------------------------------------------------------------
+    // API TOOL LOGIC (Authentication required)
+    // ---------------------------------------------------------------------
+
+    function handleErrorResponse(errorMessage, statusCode) {
+        if (statusCode === 429) { 
+            return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM Sri Lanka Time.`;
+        }
+        const errorText = String(errorMessage).toLowerCase();
+        if (errorText.includes("invalid uid")) { return "ERROR: Invalid Player ID (UID). Please check the number and try again."; } 
+        if (errorText.includes("uid already used today")) { return "COMMAND TIMEOUT: This UID was processed today. Try again after the daily reset."; }
+        if (errorText.includes("access token provided")) { return "ERROR: Login Required. Please login to continue."; }
         
-        // This is the CRITICAL part: adding the Authorization header
-        const response = await fetch(LIKES_API, {
-             method: 'POST',
-             headers: { 
-                 'Content-Type': 'application/json',
-                 'Authorization': `Bearer ${token}` // 💡 JWT Token is sent here
-             }, 
-             body: JSON.stringify({ region: region, uid: uid })
-        });
+        return `UNKNOWN ERROR: An unexpected issue occurred. Message: "${errorMessage}"`;
+    }
+
+    function formatResponseToTextArt(data) {
+        const res = data.response;
+        const nickname = res.PlayerNickname || 'N/A';
+        const uid = res.UID || 'N/A';
+        const level = res.PlayerLevel || 'N/A';
+        const likesBefore = res.LikesbeforeCommand || 0;
+        const likesAfter = res.LikesafterCommand || 0;
+        const likesGiven = res.LikesGivenByAPI || 0;
         
-        // ... (Rest of the API logic remains the same) ...
+        return `╔════════════════════════════════════════════╗
+║             ⚡ FREE FIRE LIKES ⚡             ║
+╠════════════════════════════════════════════╣
+║ COMMAND STATUS: [SUCCESS]                    ║
+║                                            ║
+║ ✦ Player Name:  ${nickname}
+║ ✦ Player ID:    ${uid}
+║ ✦ Level:        ${level}
+║                                            ║
+║ ❖ Likes Before:  👍🏻 ${likesBefore}
+║ ❖ Likes After:   👍🏻 ${likesAfter}
+║ ❖ Likes Gained:  🔥 ${likesGiven}
+║                                            ║
+╠════════════════════════════════════════════╣
+║ > Not For Resale. Copyright Sandaruwan Jayalath ©️
+╚════════════════════════════════════════════╝`;
+    }
+
+    document.getElementById('dataForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); 
+        
+        const token = getAuthToken();
+        const resultDiv = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (!token) {
+            resultDiv.innerHTML = '<div class="error-box"><span class="error-text">ERROR: Login Required. Please go to Login/Register tab.</span></div>';
+            return;
+        }
+
+        const region = document.getElementById('region').value;
+        const uid = document.getElementById('uid').value;
+
+        if (region === '') { resultDiv.innerHTML = `<div class="error-box"><span class="error-text">ERROR: Please select a Region.</span></div>`; return; }
+        if (uid.length < 5 || !/^\d+$/.test(uid)) { resultDiv.innerHTML = `<div class="error-box"><span class="error-text">ERROR: Invalid Player ID format. UID must be a number with at least 5 digits.</span></div>`; return; }
+
+        resultDiv.innerHTML = 'Executing command... Please wait.';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch(LIKES_API, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Send JWT Token
+                }, 
+                body: JSON.stringify({ region: region, uid: uid })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok && data.status === 1) {
+                const formattedOutput = formatResponseToTextArt(data);
+                resultDiv.textContent = formattedOutput;
+                resultDiv.className = 'success-text-art'; 
+            } else {
+                 let rawErrorMessage = data.error || data.message || JSON.stringify(data);
+                 const userFriendlyMessage = handleErrorResponse(rawErrorMessage, response.status);
+                 resultDiv.innerHTML = `<div class="error-box"><span class="error-text">${userFriendlyMessage}</span></div>`;
+                 resultDiv.className = '';
+            }
+            // Update user status after execution to show reduced requests
+            await fetchUserInfo(); 
+
+        } catch (error) {
+            resultDiv.innerHTML = `<div class="error-box"><span class="error-text">NETWORK ERROR: Could not connect to the proxy server. Check your connection.</span></div>`;
+            resultDiv.className = '';
+        } finally {
+            submitBtn.disabled = false;
+        }
     });
 
     // --- INITIALIZATION ---
+    document.getElementById('loginForm').addEventListener('submit', (e) => handleAuth(e, LOGIN_API));
+    document.getElementById('registerForm').addEventListener('submit', (e) => handleAuth(e, REGISTER_API));
+
     document.addEventListener('DOMContentLoaded', () => {
         renderPackages();
         fetchUserInfo(); // Check for existing token and load user status
-        showSection('tool');
+        showSection('tool'); // Default view
     });
 </script>
 
