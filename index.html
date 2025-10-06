@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire ID Finder</title>
+    <style>
+        /* CSS හැඩතල ගැන්වීම */
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-color: #f0f2f5; 
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container { 
+            max-width: 450px; 
+            width: 90%;
+            padding: 30px; 
+            background: #ffffff; 
+            border-radius: 12px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1); 
+        }
+        h1 {
+            color: #d9534f; /* Free Fire තේමාව */
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"], select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            box-sizing: border-box; 
+            border: 2px solid #ccc; 
+            border-radius: 6px;
+        }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background-color: #d9534f;
+            color: white; 
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px; 
+            cursor: pointer; 
+            transition: background-color 0.3s, opacity 0.3s; 
+        }
+        button:hover:not(:disabled) { 
+            background-color: #c9302c; 
+        }
+        button:disabled {
+            background-color: #e0a5a3;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        #result { 
+            margin-top: 30px; 
+            padding: 15px; 
+            border: 1px solid #d9534f; 
+            white-space: pre-wrap; 
+            background-color: #fff0f0; 
+            border-radius: 6px; 
+            font-size: 0.9em; 
+            overflow-x: auto;
+        }
+        .error {
+            color: #c9302c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Free Fire Player Data Finder</h1>
+    <form id="dataForm">
+        
+        <label for="region">Region තෝරන්න:</label>
+        <select id="region" name="region" required>
+            <option value="">-- Region තෝරන්න --</option>
+            <option value="sg">Singapore (sg)</option>
+            <option value="in">India (in)</option>
+            <option value="id">Indonesia (id)</option>
+            <option value="br">Brazil (br)</option>
+            <option value="na">North America (na)</option>
+        </select>
+
+        <label for="uid">Game ID (UID) ඇතුළත් කරන්න:</label>
+        <input type="text" id="uid" name="uid" placeholder="Game ID (උදා: 12345678)" required>
+
+        <button type="submit" id="submitBtn">දත්ත ලබා ගන්න</button>
+    </form>
+
+    <h2>ප්‍රතිචාරය</h2>
+    <div id="result">ප්‍රතිචාරය මෙහි දිස්වනු ඇත...</div>
+</div>
+
+<script>
+    document.getElementById('dataForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); 
+
+        const region = document.getElementById('region').value;
+        const uid = document.getElementById('uid').value;
+        const resultDiv = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        resultDiv.innerHTML = 'ඉල්ලීම යවමින්... කරුණාකර රැදී සිටින්න.';
+        submitBtn.disabled = true;
+
+        // ⚠️ අත්‍යවශ්‍යයි: ඔබේ සජීවී Railway Server URL එක මෙහි ඇතුළත් කරන්න!
+        // ඔබගේ URL: freefirewebbackend-production.up.railway.app
+        const backendUrl = 'https://freefirewebbackend-production.up.railway.app/api/get-likes'; 
+
+        try {
+            const response = await fetch(backendUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ region: region, uid: uid })
+            });
+
+            const data = await response.json();
+            
+            // දෝෂයක් ඇත්නම් එය Error ලෙස පෙන්වීමට
+            if (response.status !== 200) {
+                 resultDiv.innerHTML = `<span class="error">දෝෂය: ${JSON.stringify(data.error || data, null, 2)}</span>`;
+            } else {
+                 resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`; 
+            }
+
+        } catch (error) {
+            console.error('ඉල්ලීම යැවීමේ දෝෂය:', error);
+            resultDiv.innerHTML = '<span class="error">සම්බන්ධතා දෝෂයක්. කරුණාකර නැවත උත්සාහ කරන්න.</span>';
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+</script>
+
+</body>
+</html>
