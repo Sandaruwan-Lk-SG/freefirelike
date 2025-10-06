@@ -31,7 +31,7 @@
             margin-bottom: 25px;
             text-shadow: 0 0 5px #ff4d4d;
         }
-        h2 { /* API Response/Request Status heading */
+        h2 { 
             color: #ccc;
             margin-top: 30px;
             font-size: 1.2em;
@@ -72,20 +72,20 @@
             cursor: not-allowed;
             opacity: 0.8;
         }
-        /* Result Box Styling (Creative Text Art) */
+        /* 💡 නිවැරදි කළ ප්‍රතිඵල පෙට්ටියේ CSS */
         #result { 
-            margin-top: 15px; /* Adjusting margin after h2 */
+            margin-top: 15px; 
             padding: 15px; 
             border: 2px solid #ff4d4d; 
-            white-space: pre; 
+            white-space: pre; /* Text Art එක කැඩී නොයන ලෙස */
             background-color: #000; 
             color: #00ff40; 
             border-radius: 6px; 
             font-size: 0.9em; 
             overflow-x: auto;
-            /* 💡 Fix for text overlap */
+            /* Monospace font එකක් භාවිතයෙන් අකුරු ගැටීම වළක්වයි */
             font-family: 'Consolas', 'Courier New', Courier, monospace; 
-            line-height: 1.2; /* Tighter line-height for better ASCII consistency */
+            line-height: 1.25; /* Text Art සඳහා වඩාත් ස්ථායී අගයක් */
         }
         .error {
             color: #ff4d4d;
@@ -172,167 +172,7 @@
         const likesAfter = res.LikesafterCommand || 0;
         const likesGiven = res.LikesGivenByAPI || 0;
         
-        // Creative Text Art Format (Key Status Removed)
-        const textArt = 
-`╔════════════════════════════════════════════╗
-║             ⚡ FREE FIRE LIKES ⚡             ║
-╠════════════════════════════════════════════╣
-║ COMMAND STATUS: [SUCCESS]                    ║
-║                                            ║
-║ ✦ Player Name:  ${nickname}
-║ ✦ Player ID:    ${uid}
-║ ✦ Level:        ${level}
-║                                            ║
-║ ❖ Likes Before:  👍🏻 ${likesBefore}
-║ ❖ Likes After:   👍🏻 ${likesAfter}
-║ ❖ Likes Gained:  🔥 ${likesGiven}
-║                                            ║
-╠════════════════════════════════════════════╣
-║ > Not For Resale. Copyright Sandaruwan Jayalath ©️
-╚════════════════════════════════════════════╝`;
-        
-        return textArt;
-    }
-
-
-    document.getElementById('dataForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); 
-
-        const region = document.getElementById('region').value;
-        const uid = document.getElementById('uid').value;
-        const resultDiv = document.getElementById('result');
-        const submitBtn = document.getElementById('submitBtn');
-
-        // Client-side Validation
-        if (region === '') {
-            resultDiv.innerHTML = '<span class="error">ERROR: Please select a Region.</span>';
-            submitBtn.disabled = false;
-            return;
-        }
-        if (uid.length < 5 || !/^\d+$/.test(uid)) {
-            resultDiv.innerHTML = '<span class="error">ERROR: Invalid Player ID format. UID must be a number with at least 5 digits.</span>';
-            submitBtn.disabled = false;
-            return;
-        }
-
-        resultDiv.innerHTML = 'Executing command... Please wait.';
-        submitBtn.disabled = true;
-
-        try {
-            const response = await fetch(backendUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ region: region, uid: uid })
-            });
-
-            const data = await response.json();
-            
-            // Successful Response (status === 1)
-            if (response.status === 200 && data.status === 1) {
-                const formattedOutput = formatResponseToTextArt(data);
-                resultDiv.textContent = formattedOutput;
-            } 
-            // Error Response
-            else {
-                 let rawErrorMessage = 'Unknown error occurred.';
-                 
-                 if (data.error) { 
-                     rawErrorMessage = data.error;
-                 } else if (data.message) { 
-                     rawErrorMessage = data.message;
-                 } else { 
-                     rawErrorMessage = JSON.stringify(data);
-                 }
-                 
-                 const userFriendlyMessage = handleErrorResponse(rawErrorMessage);
-                 resultDiv.innerHTML = `<span class="error">${userFriendlyMessage}</span>`;
-            }
-
-        } catch (error) {
-            console.error('Request failed:', error);
-            resultDiv.innerHTML = '<span class="error">NETWORK ERROR: Could not connect to the proxy server. Please check your internet connection or contact the administrator.</span>';
-        } finally {
-            submitBtn.disabled = false;
-        }
-    });
-</script>
-
-</body>
-</html>
-<div class="container">
-    <h1>FF Likes System</h1>
-    <form id="dataForm">
-        
-        <label for="region">Select Region:</label>
-        <select id="region" name="region" required>
-            <option value="">-- Select Region --</option>
-            <option value="sg">Singapore (sg)</option>
-            <option value="in">India (in)</option>
-            <option value="id">Indonesia (id)</option>
-            <option value="br">Brazil (br)</option>
-            <option value="na">North America (na)</option>
-        </select>
-
-        <label for="uid">Player ID (UID):</label>
-        <input type="text" id="uid" name="uid" placeholder="Enter 8-10 digit Player ID" required>
-
-        <button type="submit" id="submitBtn">Execute Likes Command</button>
-    </form>
-
-    <h2>API Response</h2>
-    <div id="result">Result will be displayed here...</div>
-</div>
-
-<script>
-    // ⚠️ CRITICAL: Replace with your actual Railway Public URL
-    const backendUrl = 'https://freefirewebbackend-production.up.railway.app/api/get-likes'; 
-    
-    // Function to Handle and Localize Errors
-    function handleErrorResponse(errorMessage) {
-        const errorText = String(errorMessage).toLowerCase();
-
-        if (errorText.includes("invalid uid")) {
-            return "❌ EXECUTION FAILED: Invalid Player ID (UID). Please check the number and try again.";
-        } 
-        else if (errorText.includes("already received the maximum likes")) {
-            return "⚠️ NOTICE: This player has already reached the maximum like capacity for this period. Please wait until the system resets.";
-        } 
-        else if (errorText.includes("bot gave 0 likes") || errorText.includes("key's remaining amount did not decrease")) {
-            return "⚠️ ATTENTION: Command Executed, but 0 likes were given. The player may be offline or already at max capacity for the day.";
-        }
-        else if (errorText.includes("uid already used today")) {
-            const match = errorText.match(/after\s*(\d+:\d+\s*[ap]m\s*[a-z]*)\./i);
-            const resetTime = match ? match[1].toUpperCase() : 'Reset Time Unknown';
-            return `⏳ COMMAND TIMEOUT: This Player ID has been processed today. Try again after ${resetTime}.`;
-        }
-        else if (errorText.includes("invalid region")) {
-            return "❌ INVALID REGION: The selected region is not valid for this command. Please select a correct region.";
-        }
-        else if (errorText.includes("access denied")) {
-            return "SYSTEM BLOCK: Access Denied. The application is not allowed to use the server. (Contact Admin).";
-        }
-        else if (errorText.includes("not configured")) {
-            return "SERVER MISCONFIGURED: The internal API Key is missing. Please contact the site administrator.";
-        }
-        
-        return `❌ UNKNOWN ERROR: An unexpected issue occurred. Raw message: "${errorMessage}"`;
-    }
-
-    // Function to Format Successful Data into Text Art
-    function formatResponseToTextArt(data) {
-        const res = data.response;
-        
-        // Data Extraction
-        const nickname = res.PlayerNickname || 'N/A';
-        const uid = res.UID || 'N/A';
-        const level = res.PlayerLevel || 'N/A';
-        const likesBefore = res.LikesbeforeCommand || 0;
-        const likesAfter = res.LikesafterCommand || 0;
-        const likesGiven = res.LikesGivenByAPI || 0;
-        
-        // Creative Text Art Format (Key Status Removed)
+        // Creative Text Art Format (Should now display cleanly without overlap)
         const textArt = 
 `╔════════════════════════════════════════════╗
 ║             ⚡ FREE FIRE LIKES ⚡             ║
