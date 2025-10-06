@@ -31,6 +31,7 @@
             margin-bottom: 25px;
             text-shadow: 0 0 5px #ff4d4d;
         }
+        /* Heading Change: API Response -> Your Request Status */
         h2 { 
             color: #ccc;
             margin-top: 30px;
@@ -77,15 +78,15 @@
             margin-top: 15px; 
             padding: 15px; 
             border: 2px solid #ff4d4d; 
-            white-space: pre; /* Text Art එක කැඩී නොයන ලෙස */
+            white-space: pre; 
             background-color: #000; 
             color: #00ff40; 
             border-radius: 6px; 
             font-size: 0.9em; 
             overflow-x: auto;
-            /* Monospace font එකක් භාවිතයෙන් අකුරු ගැටීම වළක්වයි */
+            /* Text Overlap Fix: Monospace font and stable line-height */
             font-family: 'Consolas', 'Courier New', Courier, monospace; 
-            line-height: 1.25; /* Text Art සඳහා වඩාත් ස්ථායී අගයක් */
+            line-height: 1.25; 
         }
         .error {
             color: #ff4d4d;
@@ -172,7 +173,7 @@
         const likesAfter = res.LikesafterCommand || 0;
         const likesGiven = res.LikesGivenByAPI || 0;
         
-        // Creative Text Art Format (Should now display cleanly without overlap)
+        // Creative Text Art Format 
         const textArt = 
 `╔════════════════════════════════════════════╗
 ║             ⚡ FREE FIRE LIKES ⚡             ║
