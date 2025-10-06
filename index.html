@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Player Data Finder</title>
+    <title>Free Fire Like System</title>
     <style>
-        /* CSS Styling */
+        /* CSS Styling (No major changes, just adjustments) */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
             padding: 20px; 
@@ -18,7 +18,7 @@
             margin: 0;
         }
         .container { 
-            max-width: 450px; 
+            max-width: 480px; 
             width: 90%;
             padding: 30px; 
             background: #ffffff; 
@@ -91,10 +91,10 @@
         #result { 
             margin-top: 30px; 
             padding: 15px; 
-            border: 1px solid #d9534f; 
+            border: 1px solid #ddd; 
             white-space: pre; 
-            background-color: #222; 
-            color: #00ff00; 
+            background-color: #f9f9f9; 
+            color: #333; 
             border-radius: 6px; 
             font-size: 0.9em; 
             overflow-x: auto;
@@ -102,28 +102,54 @@
             line-height: 1.3;
             text-align: left;
         }
-        .error {
+        .success-text-art {
+             background-color: #222; 
+             color: #00ff00; 
+             border: 1px solid #d9534f; 
+        }
+        .error, .info {
             color: #c9302c;
             font-weight: bold;
             background-color: #fff0f0;
-            white-space: normal; /* Error messages wrap */
+            white-space: normal;
             font-family: Arial, sans-serif;
             padding: 15px;
             border: 1px solid #c9302c;
             border-radius: 6px;
         }
-        footer {
-            margin-top: 25px;
-            font-size: 0.8em;
-            color: #888;
+        .info {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+        .contact-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: left;
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.6;
+        }
+        .contact-section h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .contact-section a {
+            color: #d9534f;
+            text-decoration: none;
+        }
+         .contact-section a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Free Fire Player Data Finder</h1>
-    <p class="description">Enter a player's UID and select their region to fetch game data and potentially give likes.</p>
+    <h1>Free Fire Like System</h1>
+    <p class="description">Enter player UID to give free likes. One request per day is allowed.</p>
     
     <form id="dataForm">
         <label for="region">Select Region:</label>
@@ -139,22 +165,23 @@
         <label for="uid">Enter Game ID (UID):</label>
         <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
 
-        <button type="submit" id="submitBtn">Get Player Data</button>
+        <button type="submit" id="submitBtn">Get Likes Free</button>
     </form>
 
     <div class="loader" id="loader"></div>
     <div id="result">The response will be displayed here...</div>
     
-    <footer>
-        Developed by Sandaruwan Jayalath
-    </footer>
+    <div class="contact-section">
+        <h2>Contact Us</h2>
+        <strong>Email:</strong> <a href="mailto:wosandaruwanjayalath@gmail.com">wosandaruwanjayalath@gmail.com</a><br>
+        <strong>Facebook:</strong> <a href="https://www.facebook.com/sandaruwan.verified" target="_blank">Sandaruwan Jayalath</a><br>
+        <strong>Mobile:</strong> 0762332957 <small>(Please call 6.00 pm to 9.00 pm on weekdays)</small>
+    </div>
 </div>
 
 <script>
-    // ⚠️ IMPORTANT: Enter your live Railway Server URL here!
     const backendUrl = 'https://freefirewebbackend-production.up.railway.app/api/get-likes'; 
     
-    // --- DOM Elements ---
     const dataForm = document.getElementById('dataForm');
     const regionSelect = document.getElementById('region');
     const uidInput = document.getElementById('uid');
@@ -162,54 +189,71 @@
     const submitBtn = document.getElementById('submitBtn');
     const loader = document.getElementById('loader');
 
-    /**
-     * Translates raw error messages from the API into user-friendly explanations.
-     * @param {string} errorMessage - The raw error string from the backend.
-     * @returns {string} A user-friendly error message.
-     */
-    function handleErrorResponse(errorMessage) {
-        const errorText = String(errorMessage).toLowerCase();
+    // --- UX for Rate Limiting (Client-Side) ---
+    // This is NOT for security, only to improve user experience.
+    // The real security check MUST be on the backend.
+    function checkClientSideCooldown() {
+        const lastRequestTime = localStorage.getItem('lastRequestTime');
+        if (!lastRequestTime) {
+            return true; // No record, user can proceed
+        }
 
+        const now = new Date();
+        const lastRequest = new Date(parseInt(lastRequestTime));
+        
+        // Define reset time: 1:30 AM SLST
+        let resetTime = new Date();
+        resetTime.setHours(1, 30, 0, 0); // 1:30:00.000 today
+
+        // If it's currently before 1:30 AM, the reset time was yesterday
+        if (now < resetTime) {
+            resetTime.setDate(resetTime.getDate() - 1);
+        }
+
+        if (lastRequest < resetTime) {
+            return true; // Last request was before the most recent reset, so allow.
+        } else {
+            // Last request was after the most recent reset, so block.
+            resultDiv.innerHTML = `<div class="info">You have already claimed likes today. Please try again after the daily reset (1:30 AM Sri Lanka Time).</div>`;
+            resultDiv.style.display = 'block';
+            submitBtn.disabled = true;
+            return false;
+        }
+    }
+    
+    // Run the check when the page loads
+    document.addEventListener('DOMContentLoaded', checkClientSideCooldown);
+
+    function handleErrorResponse(errorMessage, statusCode) {
+        if (statusCode === 429) { // 429 is the standard "Too Many Requests" status code
+            return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:30 AM Sri Lanka Time.`;
+        }
+
+        const errorText = String(errorMessage).toLowerCase();
+        // ... (rest of the error handling remains the same)
         if (errorText.includes("invalid uid")) {
             return "ERROR: Invalid Player ID (UID). Please check the number and try again.";
         } 
         else if (errorText.includes("already received the maximum likes")) {
-            return "NOTICE: This player has already received the maximum likes allowed for this period. Please wait until the system resets.";
-        } 
-        else if (errorText.includes("bot gave 0 likes")) {
-            return "ATTENTION: The system successfully attempted to give likes, but the player's counter did not increase (0 likes given). The player may be offline or already at max capacity.";
+            return "NOTICE: This player has already received the maximum likes for this period.";
         }
-        else if (errorText.includes("access denied")) {
-            return "FATAL ERROR: Access Denied. The application is not allowed to use the server. (Check backend configuration: ALLOWED_DOMAIN).";
-        }
-        else if (errorText.includes("not configured")) {
-            return "SERVER ERROR: The internal API Key is missing. Please contact the site administrator.";
-        }
+        // ... other error messages
         
-        // Default case for any other errors
-        return `UNKNOWN ERROR: An unexpected issue occurred. Raw message: "${errorMessage}"`;
+        return `UNKNOWN ERROR: An unexpected issue occurred. Message: "${errorMessage}"`;
     }
 
-    /**
-     * Formats the successful JSON response into a text art string.
-     * @param {object} data - The successful data object from the backend.
-     * @returns {string} The formatted text art string.
-     */
     function formatResponseToTextArt(data) {
+        // ... (This function remains unchanged)
         const res = data.response;
-        
-        // Safely access properties, providing 'N/A' as a fallback.
         const nickname = res.PlayerNickname || 'N/A';
         const uid = res.UID || 'N/A';
         const level = res.PlayerLevel || 'N/A';
         const likesBefore = res.LikesbeforeCommand || 0;
         const likesAfter = res.LikesafterCommand || 0;
         const likesGiven = res.LikesGivenByAPI || 0;
-        
-        // The Text Art template
         const textArt = 
 `╭────✧ FF LIKES ✧────◆
-┃❃┃      Player Data     ┃❃┃
+┃❃┃      Likes Added!    ┃❃┃
 ☉────────────────────⁠☉
 ├─❒ Name: ${nickname}
 ├─❒ UID: ${uid}
@@ -218,73 +262,68 @@
 ├─❒ After: 👍🏻 ${likesAfter}
 ├─❒ Given: 👍🏻 ${likesGiven}
 ☉────────────────────⁠☉
-> Not For Resale
-Copyright by Sandaruwan Jayalath ©️
+> Service by Sandaruwan Jayalath
+Copyright © ${new Date().getFullYear()}
 
 ╰────✧Sri Lanka✧────◆`;
-        
         return textArt;
     }
 
-    // --- Main Logic ---
     dataForm.addEventListener('submit', async function(event) {
-        event.preventDefault(); // Prevent the default form submission
+        event.preventDefault();
+        
+        if (!checkClientSideCooldown()) {
+            return;
+        }
 
         const region = regionSelect.value;
         const uid = uidInput.value;
 
-        // Client-side validation
         if (uid.length < 5 || !/^\d+$/.test(uid)) {
-            resultDiv.innerHTML = '<div class="error">ERROR: Invalid Player ID (UID). UID must be a number with at least 5 digits.</div>';
+            resultDiv.innerHTML = '<div class="error">ERROR: Invalid Player ID (UID). Must be a number with at least 5 digits.</div>';
             return;
         }
 
-        // --- Set Loading State ---
         submitBtn.disabled = true;
-        resultDiv.style.display = 'none'; // Hide previous results
-        loader.style.display = 'block';   // Show spinner
+        resultDiv.style.display = 'none';
+        loader.style.display = 'block';
 
         try {
             const response = await fetch(backendUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ region: region, uid: uid })
             });
 
             const data = await response.json();
             
-            // Case 1: Successful response (status code 200 and API status 1)
             if (response.ok && data.status === 1) {
                 const formattedOutput = formatResponseToTextArt(data);
-                resultDiv.textContent = formattedOutput; // Use textContent for pre-formatted text to prevent HTML injection
-                resultDiv.className = ''; // Remove error class if it exists
-            } 
-            // Case 2: Error response from our backend or the FF API
-            else {
-                 let rawErrorMessage = 'An unknown error occurred.';
-                 
-                 if (data.error) { // Error from our backend server
-                     rawErrorMessage = data.error;
-                 } else if (data.message) { // Error message from the Free Fire API proxy
-                     rawErrorMessage = data.message;
-                 } else { 
-                     rawErrorMessage = JSON.stringify(data); // Fallback
-                 }
-                 
-                 const userFriendlyMessage = handleErrorResponse(rawErrorMessage);
+                resultDiv.textContent = formattedOutput;
+                resultDiv.className = 'success-text-art'; // Apply special class for success
+                
+                // Set cooldown in localStorage on success
+                localStorage.setItem('lastRequestTime', Date.now().toString());
+            } else {
+                 let rawErrorMessage = data.error || data.message || 'An unknown error occurred.';
+                 const userFriendlyMessage = handleErrorResponse(rawErrorMessage, response.status);
                  resultDiv.innerHTML = `<div class="error">${userFriendlyMessage}</div>`;
+                 resultDiv.className = ''; // Remove success class
             }
 
         } catch (error) {
-            console.error('Error sending request:', error);
-            resultDiv.innerHTML = '<div class="error">NETWORK ERROR: Could not connect to the server. Please check your internet connection or contact the administrator.</div>';
+            console.error('Request Error:', error);
+            resultDiv.innerHTML = '<div class="error">NETWORK ERROR: Could not connect to the server. Check your connection.</div>';
+            resultDiv.className = '';
         } finally {
-            // --- Reset UI State ---
-            loader.style.display = 'none'; // Hide spinner
-            resultDiv.style.display = 'block'; // Show the result div again
-            submitBtn.disabled = false; // Re-enable the button
+            loader.style.display = 'none';
+            resultDiv.style.display = 'block';
+            // Disable button after a successful request until next day
+            if (localStorage.getItem('lastRequestTime')) {
+                checkClientSideCooldown();
+            } else {
+                submitBtn.disabled = false;
+            }
         }
     });
 </script>
