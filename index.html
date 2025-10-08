@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
     
     <style>
-        /* Base Styling */
+        /* CSS Styling - Optimized for Mobile/Desktop */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
             padding: 20px; 
@@ -264,12 +264,15 @@
     }
     
     // 💡 Function to get Device ID (Fingerprint)
+    let globalDeviceID = null;
     async function getDeviceID() {
+        if (globalDeviceID) return globalDeviceID;
         try {
             if (typeof FingerprintJS === 'undefined') return 'fallback-no-fpjs';
             const fp = await FingerprintJS.load();
             const result = await fp.get();
-            return result.visitorId;
+            globalDeviceID = result.visitorId;
+            return globalDeviceID;
         } catch (e) {
             console.error("Device ID generation failed:", e);
             return 'error-device';
@@ -582,7 +585,7 @@
                 body: JSON.stringify({ 
                     region: region, 
                     uid: uid, 
-                    deviceId: deviceId // CRITICAL: Device ID is sent
+                    deviceId: deviceId 
                 })
             });
 
@@ -610,18 +613,19 @@
 
     // --- INITIALIZATION ---
     document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault(); // FIX: Prevents page reload
+        e.preventDefault(); 
         handleAuth(e, LOGIN_API);
     });
     document.getElementById('registerForm').addEventListener('submit', (e) => {
-        e.preventDefault(); // FIX: Prevents page reload
+        e.preventDefault(); 
         handleAuth(e, REGISTER_API);
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+        await getDeviceID(); // Pre-load device ID
         renderPackages();
         fetchUserInfo(); 
-        showSection('tool'); // Default to API Tool view
+        showSection('tool'); 
     });
 </script>
 
