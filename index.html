@@ -276,7 +276,7 @@
         }
     }
     
-    // Renders the correct section based on tab click
+    // Renders the correct section based on tab click (FIXED NAVIGATION)
     function showSection(sectionId) {
         // Hide all major sections
         document.getElementById('auth-section').style.display = 'none';
@@ -346,16 +346,10 @@
     // Fetches user status from the backend (Required for persistent login)
     async function fetchUserInfo() {
         const token = getAuthToken();
-        if (!token) {
-             updateNavAndStatus(null);
-             return;
-        }
+        if (!token) { updateNavAndStatus(null); return; }
 
         try {
-            const response = await fetch(USER_INFO_API, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetch(USER_INFO_API, { headers: { 'Authorization': `Bearer ${token}` } });
             const data = await response.json();
             
             if (response.ok) {
@@ -366,7 +360,6 @@
                 updateNavAndStatus(null);
             }
         } catch (error) {
-            console.error("Failed to fetch user info:", error);
             localStorage.removeItem('jwtToken');
         }
         return null;
@@ -412,7 +405,7 @@
     function logoutUser() {
         localStorage.removeItem('jwtToken');
         updateNavAndStatus(null);
-        showSection('auth'); // Redirect to login page
+        showSection('auth'); 
         showMessage('auth-message', 'Logged out successfully.', true);
     }
     
@@ -513,13 +506,11 @@
     // ---------------------------------------------------------------------
 
     function handleErrorResponse(errorMessage, statusCode) {
-        if (statusCode === 429) { 
-            return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM Sri Lanka Time.`;
-        }
+        if (statusCode === 429) { return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM Sri Lanka Time.`; }
         
         const errorText = String(errorMessage).toLowerCase();
 
-        // 💡 Fraud Message (MUST match the backend block message)
+        // Fraud Message 
         if (errorText.includes("fraud attempt detected") || errorText.includes("multi-account block")) {
              return "FRAUD ATTEMPT DETECTED: It appears you are attempting to cheat. This account or device has already claimed the daily limit. Our policy against cheating is zero tolerance. If this is an honest mistake, please contact us via email to resolve the issue. Fraudulent requests will be rejected.";
         }
@@ -562,7 +553,7 @@
         event.preventDefault(); 
         
         const token = getAuthToken();
-        const deviceId = await getDeviceID(); // CRITICAL: Device ID for security
+        const deviceId = await getDeviceID(); 
         const resultDiv = document.getElementById('result');
         const submitBtn = document.getElementById('submitBtn');
 
@@ -607,7 +598,6 @@
                  resultDiv.innerHTML = `<div class="error-box"><span class="error-text">${userFriendlyMessage}</span></div>`;
                  resultDiv.className = '';
             }
-            // Update user status after execution to show reduced requests
             await fetchUserInfo(); 
 
         } catch (error) {
@@ -619,14 +609,19 @@
     });
 
     // --- INITIALIZATION ---
-    document.getElementById('loginForm').addEventListener('submit', (e) => handleAuth(e, LOGIN_API));
-    document.getElementById('registerForm').addEventListener('submit', (e) => handleAuth(e, REGISTER_API));
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault(); // FIX: Prevents page reload
+        handleAuth(e, LOGIN_API);
+    });
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault(); // FIX: Prevents page reload
+        handleAuth(e, REGISTER_API);
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
-        // [Note: showSection, toggleAuthView, renderPackages are assumed to exist above this line in the final file]
         renderPackages();
         fetchUserInfo(); 
-        showSection('tool');
+        showSection('tool'); // Default to API Tool view
     });
 </script>
 
