@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
     
     <style>
-        /* CSS Styling - Optimized for Mobile/Desktop */
+        /* CSS Styling */
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
             padding: 20px; 
@@ -128,15 +128,30 @@
         </div>
 
         <div id="register-form" style="display:none;">
-            <h3>Register</h3>
-            <form id="registerForm">
-                <label for="register-username">Username:</label>
-                <input type="text" id="register-username" required>
-                <label for="register-password">Password:</label>
-                <input type="password" id="register-password" required>
-                <button type="submit" class="secondary-btn">Register</button>
+            <h3>Register (Step 1: Request Code)</h3>
+            <form id="requestCodeForm">
+                <label for="reg-username">Username:</label>
+                <input type="text" id="reg-username" required>
+                <label for="reg-email">Email:</label>
+                <input type="text" id="reg-email" placeholder="Verification code will be sent here" required>
+                <label for="reg-password">Password:</label>
+                <input type="password" id="reg-password" required>
+                <button type="submit" class="secondary-btn">Request Verification Code</button>
             </form>
             <p style="margin-top: 15px;">Already have an account? <a href="#" onclick="toggleAuthView('login')">Login here</a></p>
+            <p style="margin-top: 10px;">Already have a code? <a href="#" onclick="toggleAuthView('verify')">Verify here</a></p>
+        </div>
+        
+        <div id="verify-form" style="display:none;">
+            <h3>Register (Step 2: Verify Code)</h3>
+            <form id="verifyCodeForm">
+                <label for="verify-username">Username:</label>
+                <input type="text" id="verify-username" placeholder="Enter your requested username" required>
+                <label for="verify-code">Verification Code:</label>
+                <input type="text" id="verify-code" placeholder="Enter the 6-digit code from email" required>
+                <button type="submit" class="secondary-btn">Verify and Register</button>
+            </form>
+            <p style="margin-top: 15px;">Need a new code? <a href="#" onclick="toggleAuthView('register')">Request new code</a></p>
         </div>
         
         <button id="logout-btn" onclick="logoutUser()" style="display:none; background-color: #ff4d4d; margin-top: 20px;">Logout</button>
@@ -227,7 +242,8 @@
     // --- Configuration (UPDATE THIS BASE URL!) ---
     const BASE_URL = 'https://freefirewebbackend-production.up.railway.app';
     const LOGIN_API = `${BASE_URL}/api/login`;
-    const REGISTER_API = `${BASE_URL}/api/register`;
+    const REQUEST_CODE_API = `${BASE_URL}/api/request-code`; // 💡 NEW
+    const VERIFY_REGISTER_API = `${BASE_URL}/api/verify-and-register`; // 💡 NEW
     const LIKES_API = `${BASE_URL}/api/get-likes`;
     const REDEEM_API = `${BASE_URL}/api/redeem`;
     const USER_INFO_API = `${BASE_URL}/api/user-info`; 
@@ -252,10 +268,7 @@
     
     // --- UTILITIES AND UI MANAGEMENT ---
 
-    function getAuthToken() {
-        return localStorage.getItem('jwtToken');
-    }
-
+    function getAuthToken() { return localStorage.getItem('jwtToken'); }
     function showMessage(elementId, message, isSuccess = false) {
         const el = document.getElementById(elementId);
         el.textContent = message;
@@ -268,7 +281,7 @@
     async function getDeviceID() {
         if (globalDeviceID) return globalDeviceID;
         try {
-            if (typeof FingerprintJS === 'undefined') return 'fallback-no-fpjs';
+            if (typeof FingerprintJS === 'undefined') return 'error-fpjs-missing';
             const fp = await FingerprintJS.load();
             const result = await fp.get();
             globalDeviceID = result.visitorId;
@@ -314,11 +327,20 @@
         }
     }
     
-    // Toggles between Login and Register forms
+    // Toggles between Login and Register/Verify forms
     function toggleAuthView(view) {
-        document.getElementById('login-form').style.display = (view === 'login' ? 'block' : 'none');
-        document.getElementById('register-form').style.display = (view === 'register' ? 'block' : 'none');
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'none'; // Request Code Form
+        document.getElementById('verify-form').style.display = 'none';    // Verification Form
         document.getElementById('auth-message').style.display = 'none';
+
+        if (view === 'login') {
+            document.getElementById('login-form').style.display = 'block';
+        } else if (view === 'register') {
+            document.getElementById('register-form').style.display = 'block';
+        } else if (view === 'verify') {
+            document.getElementById('verify-form').style.display = 'block';
+        }
     }
 
 
@@ -346,7 +368,6 @@
         }
     }
 
-    // Fetches user status from the backend (Required for persistent login)
     async function fetchUserInfo() {
         const token = getAuthToken();
         if (!token) { updateNavAndStatus(null); return; }
@@ -368,15 +389,15 @@
         return null;
     }
 
-    // --- AUTHENTICATION HANDLERS (UPDATED TO SEND DEVICE ID) ---
+    // --- AUTHENTICATION HANDLERS ---
 
     async function handleAuth(event, endpoint) {
+        // This is for LOGIN only (No email/code/device needed for simple login once registered)
         event.preventDefault();
-        const deviceId = await getDeviceID(); // 💡 Get Device ID for security
+        const deviceId = await getDeviceID(); 
         
-        const formId = event.target.id;
-        const username = document.getElementById(formId === 'loginForm' ? 'login-username' : 'register-username').value;
-        const password = document.getElementById(formId === 'loginForm' ? 'login-password' : 'register-password').value;
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
         const msgId = 'auth-message';
         
         showMessage(msgId, 'Processing...', false);
@@ -385,7 +406,7 @@
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // CRITICAL FIX: Device ID included in request body for multi-account check
+                // CRITICAL: Device ID must be included in login for the security check on the backend
                 body: JSON.stringify({ username, password, deviceId }) 
             });
 
@@ -396,7 +417,7 @@
                 showMessage(msgId, data.message + ' Redirecting...', true);
                 
                 await fetchUserInfo(); 
-                showSection('tool'); // Redirect to tool after login
+                showSection('tool');
             } else {
                 showMessage(msgId, data.message || data.error || 'Authentication failed.', false);
             }
@@ -406,15 +427,79 @@
     }
 
     function logoutUser() {
+        // ... (Logout logic remains the same) ...
         localStorage.removeItem('jwtToken');
         updateNavAndStatus(null);
         showSection('auth'); 
         showMessage('auth-message', 'Logged out successfully.', true);
     }
     
-    // --- PACKAGE AND REDEMPTION LOGIC ---
+    // --- NEW HANDLER: Step 1 - Request Code ---
+    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('reg-username').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const msgId = 'auth-message';
+        const deviceId = await getDeviceID();
+        
+        showMessage(msgId, 'Sending verification code...', false);
 
-    function renderPackages() {
+        try {
+            const response = await fetch(REQUEST_CODE_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, deviceId })
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showMessage(msgId, data.message + ' Redirecting to verification step...', true);
+                toggleAuthView('verify'); // Move to Step 2
+                document.getElementById('verify-username').value = username; // Pre-fill username
+            } else {
+                showMessage(msgId, data.message || data.error || 'Failed to request code.', false);
+            }
+        } catch (error) {
+            showMessage(msgId, 'Network error. Could not connect to the server.', false);
+        }
+    });
+
+
+    // --- NEW HANDLER: Step 2 - Verify Code and Final Register ---
+    document.getElementById('verifyCodeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('verify-username').value;
+        const code = document.getElementById('verify-code').value;
+        const msgId = 'auth-message';
+        const deviceId = await getDeviceID();
+        
+        showMessage(msgId, 'Verifying code and finalizing registration...', false);
+
+        try {
+            const response = await fetch(VERIFY_REGISTER_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, code, deviceId })
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success && data.token) {
+                localStorage.setItem('jwtToken', data.token);
+                showMessage(msgId, data.message + ' You are now logged in.', true);
+                
+                await fetchUserInfo(); 
+                showSection('tool'); // Success! Redirect to tool
+            } else {
+                showMessage(msgId, data.message || 'Verification failed.', false);
+            }
+        } catch (error) {
+            showMessage(msgId, 'Network error. Could not connect to the server.', false);
+        }
+    });
+
+    // --- PACKAGE AND REDEMPTION LOGIC ---
+    function renderPackages() { /* ... (Logic remains the same) ... */
         const listContainer = document.getElementById('package-cards-container');
         listContainer.innerHTML = '';
         
@@ -462,30 +547,20 @@
         }
     }
     
-    async function redeemCode() {
+    async function redeemCode() { /* ... (Logic remains the same) ... */
         const code = document.getElementById('premium-code-input').value.trim();
         const statusElement = document.getElementById('redemption-status');
         const token = getAuthToken();
 
-        if (!token) {
-            statusElement.innerHTML = '<span class="error-msg">You must be logged in to redeem a code.</span>';
-            return;
-        }
-
-        if (!code) {
-            statusElement.innerHTML = '<span class="error-msg">Please enter the code provided by the Admin.</span>';
-            return;
-        }
+        if (!token) { statusElement.innerHTML = '<span class="error-msg">You must be logged in to redeem a code.</span>'; return; }
+        if (!code) { statusElement.innerHTML = '<span class="error-msg">Please enter the code provided by the Admin.</span>'; return; }
 
         statusElement.innerHTML = '<span class="success-msg" style="color:#007bff; background:white;">Processing activation...</span>';
 
         try {
              const response = await fetch(REDEEM_API, {
                  method: 'POST',
-                 headers: { 
-                     'Content-Type': 'application/json',
-                     'Authorization': `Bearer ${token}` 
-                 },
+                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                  body: JSON.stringify({ code: code })
              });
              
@@ -493,7 +568,7 @@
              
              if (response.ok && result.success) {
                  statusElement.innerHTML = `<span class="success-msg">✅ Success! Plan active for ${result.duration}. Limit: ${result.requests} commands/day.</span>`;
-                 await fetchUserInfo(); // Update nav status
+                 await fetchUserInfo(); 
              } else {
                  statusElement.innerHTML = `<span class="error-msg">❌ Activation Failed: ${result.message || 'Invalid or expired code.'}</span>`;
              }
@@ -508,24 +583,19 @@
     // API TOOL LOGIC 
     // ---------------------------------------------------------------------
 
-    function handleErrorResponse(errorMessage, statusCode) {
+    function handleErrorResponse(errorMessage, statusCode) { /* ... (Logic remains the same) ... */
         if (statusCode === 429) { return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM Sri Lanka Time.`; }
-        
         const errorText = String(errorMessage).toLowerCase();
-
-        // Fraud Message 
         if (errorText.includes("fraud attempt detected") || errorText.includes("multi-account block")) {
              return "FRAUD ATTEMPT DETECTED: It appears you are attempting to cheat. This account or device has already claimed the daily limit. Our policy against cheating is zero tolerance. If this is an honest mistake, please contact us via email to resolve the issue. Fraudulent requests will be rejected.";
         }
-
         if (errorText.includes("invalid uid")) { return "ERROR: Invalid Player ID (UID). Please check the number and try again."; } 
         if (errorText.includes("uid already used today")) { return "COMMAND TIMEOUT: This UID was processed today. Try again after the daily reset."; }
         if (errorText.includes("access token provided")) { return "ERROR: Login Required. Please login to continue."; }
-        
         return `UNKNOWN ERROR: An unexpected issue occurred. Message: "${errorMessage}"`;
     }
 
-    function formatResponseToTextArt(data) {
+    function formatResponseToTextArt(data) { /* ... (Logic remains the same) ... */
         const res = data.response;
         const nickname = res.PlayerNickname || 'N/A';
         const uid = res.UID || 'N/A';
@@ -546,7 +616,7 @@
 ║ ❖ Likes Before:  👍🏻 ${likesBefore}
 ║ ❖ Likes After:   👍🏻 ${likesAfter}
 ║ ❖ Likes Gained:  🔥 ${likesGiven}
-║                                            ║
+				║                                            ║
 ╠════════════════════════════════════════════╣
 ║ > Not For Resale. Copyright Sandaruwan Jayalath ©️
 ╚════════════════════════════════════════════╝`;
@@ -618,11 +688,41 @@
     });
     document.getElementById('registerForm').addEventListener('submit', (e) => {
         e.preventDefault(); 
-        handleAuth(e, REGISTER_API);
+        handleAuth(e, REGISTER_API); // 💡 IMPORTANT: This now calls handleAuth, but should call requestCodeForm handler
+    });
+    // --- FIX: Change Register submit to use requestCodeForm handler ---
+    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('reg-username').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const msgId = 'auth-message';
+        const deviceId = await getDeviceID();
+        
+        showMessage(msgId, 'Sending verification code...', false);
+
+        try {
+            const response = await fetch(REQUEST_CODE_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, deviceId })
+            });
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showMessage(msgId, data.message + ' Redirecting to verification step...', true);
+                toggleAuthView('verify'); // Move to Step 2
+                document.getElementById('verify-username').value = username; // Pre-fill username
+            } else {
+                showMessage(msgId, data.message || data.error || 'Failed to request code.', false);
+            }
+        } catch (error) {
+            showMessage(msgId, 'Network error. Could not connect to the server.', false);
+        }
     });
 
     document.addEventListener('DOMContentLoaded', async () => {
-        await getDeviceID(); // Pre-load device ID
+        await getDeviceID(); 
         renderPackages();
         fetchUserInfo(); 
         showSection('tool'); 
