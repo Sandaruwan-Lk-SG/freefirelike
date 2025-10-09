@@ -31,7 +31,7 @@
             font-weight: 600;
             font-size: 1.0em;
         }
-        .sidebar button:hover, .sidebar button.nav-active {
+        .sidebar button:hover:not(.logout-btn), .sidebar button.nav-active {
             background-color: #34495e;
             border-left: 5px solid #d9534f;
             padding-left: 20px;
@@ -39,6 +39,8 @@
         .logout-btn { 
             background-color: #e74c3c !important; 
             margin-top: 30px; 
+            width: 80%;
+            margin-left: 10%;
         }
 
         /* Content Area */
@@ -103,7 +105,7 @@
                     <div class="input-group">
                         <label style="width: 30%;">Requests/Day: <input type="number" id="requests" min="1" max="100" required value="50"></label>
                         <label style="width: 30%;">Duration (Days): <select id="days" required><option value="7">7 Days</option><option value="30">30 Days</option><option value="365">365 Days</option></select></label>
-                        <label style="width: 40%;">Admin Key (Auto-Filled): <input type="password" id="dummyKey" disabled value="Secured"></label>
+                        <label style="width: 40%;">Admin Key (Secured): <input type="password" id="dummyKey" disabled value="Secured"></label>
                     </div>
                     <button type="submit" style="background-color: #d9534f;">Generate and Save Code</button>
                 </form>
@@ -114,8 +116,8 @@
                     <p style="font-size: 0.8em; color: #333;">Click to Copy | Limit: <span id="limitValue"></span> reqs / Days: <span id="daysValue"></span></p>
                 </div>
                 
-                <h4 style="margin-top: 30px;">Code Review (Last 20 Codes)</h4>
-                <p id="code-review-status-msg" class="status-msg">Loading codes...</p>
+                <h4 style="margin-top: 30px;">Code Review (Active & Used Codes)</h4>
+                <p id="code-review-status-msg" class="status-msg" style="display:none;">Loading codes...</p>
                 <div id="code-review-table-container" class="data-section"></div>
 
             </div>
@@ -126,13 +128,13 @@
                     <input type="text" id="userSearch" placeholder="Search by Username, Email or ID...">
                     <button onclick="fetchUsers()">Search/Refresh</button>
                 </div>
-                <p id="user-status-msg" class="status-msg">Loading user data...</p>
+                <p id="user-status-msg" class="status-msg" style="display:none;">Loading user data...</p>
                 <div id="users-table-container" class="data-section"></div>
             </div>
             
             <div id="logs-section" class="content-section" style="display: none;">
                 <h3>System Logs (Last 100 Requests)</h3>
-                <p id="log-status-msg" class="status-msg">Loading log data...</p>
+                <p id="log-status-msg" class="status-msg" style="display:none;">Loading log data...</p>
                 <div id="logs-table-container" class="data-section"></div>
             </div>
 
@@ -152,7 +154,7 @@
     const ADMIN_GENERATE_API = `${BASE_URL}/api/admin/generate-code`;
     const ADMIN_USERS_API = `${BASE_URL}/api/admin/users`;
     const ADMIN_LOGS_API = `${BASE_URL}/api/admin/logs`;
-    const ADMIN_CODE_REVIEW_API = `${BASE_URL}/api/admin/codes`; // 💡 NEW: Conceptual Endpoint for code review
+    const ADMIN_CODE_REVIEW_API = `${BASE_URL}/api/admin/codes`; // 💡 Needs backend implementation
     const ADMIN_USER_INFO_API = `${BASE_URL}/api/user-info`; 
     const ADMIN_SUSPEND_API = `${BASE_URL}/api/admin/suspend-user`; 
     const ADMIN_REMOVE_CODE_API = `${BASE_URL}/api/admin/remove-code`; 
@@ -182,16 +184,19 @@
     
     function showAdminSection(sectionId) {
         document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+        
+        // 💡 FIX 1: Correctly handles sidebar active class switching
         document.querySelectorAll('.sidebar button').forEach(el => el.classList.remove('nav-active'));
+        const navButton = document.getElementById('nav-' + sectionId);
+        if (navButton) navButton.classList.add('nav-active');
+
 
         document.getElementById(sectionId + '-section').style.display = 'block';
-        document.getElementById('nav-' + sectionId).classList.add('nav-active');
 
         // Load data specific to the section
         if (sectionId === 'codes') fetchCodes(); 
         if (sectionId === 'users') fetchUsers();
         if (sectionId === 'logs') fetchLogs();
-        // Stats section remains conceptual for now
     }
     
     function copyCode(element) {
@@ -211,11 +216,31 @@
         document.getElementById('admin-login-status').textContent = 'Logged out.';
     }
 
-    // --- Authentication Logic (FIXED HANDLER) ---
+    // --- Data Fetching Core ---
+    async function fetchData(api, statusElId, renderFunction) {
+        if (!adminToken) return updateStatus(statusElId, 'Authentication required.', false);
+        document.getElementById(statusElId).textContent = 'Loading...';
+        document.getElementById(statusElId).style.display = 'block'; // Ensure loading message is visible
 
+        try {
+            const response = await fetch(api, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+            if (response.status === 403) throw new Error("ACCESS DENIED.");
+            
+            const data = await response.json();
+            
+            updateStatus(statusElId, 'Data loaded successfully.', true);
+            renderFunction(data);
+
+        } catch(error) {
+            updateStatus(statusElId, `Error fetching data: ${error.message}`, false);
+            if (error.message.includes("ACCESS DENIED") || error.message.includes("Token invalid")) adminLogout();
+        }
+    }
+
+
+    // 1. Authenticate Admin (FIXED HANDLER)
     document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
-        e.preventDefault(); // 💡 CRITICAL FIX: Prevent page reload
-        
+        e.preventDefault(); 
         const email = document.getElementById('admin-email').value;
         const password = document.getElementById('admin-password').value;
         const statusEl = document.getElementById('admin-login-status');
@@ -229,7 +254,6 @@
             const response = await fetch(ADMIN_LOGIN_API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Use email/password and dummy deviceId
                 body: JSON.stringify({ email, password, deviceId }) 
             });
 
@@ -248,8 +272,7 @@
                     statusEl.textContent = 'Login successful!';
                     statusEl.className = 'status-msg status-success';
                 } else {
-                    // Block access if token is valid but role is not 'admin'
-                    statusEl.textContent = 'Login failed: Insufficient permissions (You are not an Admin).';
+                    statusEl.textContent = 'Login failed: Insufficient permissions (Not Admin).';
                     statusEl.className = 'status-msg status-error';
                     localStorage.removeItem('adminToken');
                 }
@@ -292,7 +315,7 @@
                 
                 document.getElementById('code-output-box').style.display = 'block';
                 updateStatus('code-status', "SUCCESS! Code saved to database. Click code to copy.", true);
-                fetchCodes(); // Refresh code review table
+                fetchCodes(); 
             } else {
                 updateStatus('code-status', `Error: ${data.message || 'Generation failed. Check server logs.'}`, false);
                 document.getElementById('code-output-box').style.display = 'none';
@@ -304,31 +327,12 @@
         }
     });
 
+    // 3. Render Functions (Users, Logs, Codes)
 
-    // 3. Data Fetching Core
-    async function fetchData(api, statusElId, renderFunction) {
-        if (!adminToken) return updateStatus(statusElId, 'Authentication required.', false);
-        document.getElementById(statusElId).textContent = 'Loading...';
-
-        try {
-            const response = await fetch(api, { headers: { 'Authorization': `Bearer ${adminToken}` } });
-            if (response.status === 403) throw new Error("ACCESS DENIED: Token invalid or insufficient permissions.");
-            
-            const data = await response.json();
-            
-            updateStatus(statusElId, 'Data loaded successfully.', true);
-            renderFunction(data, 'users-table-container');
-
-        } catch(error) {
-            updateStatus(statusElId, `Error fetching data: ${error.message}`, false);
-            if (error.message.includes("ACCESS DENIED") || error.message.includes("Token invalid")) adminLogout();
-        }
-    }
-
-    // 4. Render Functions (Users, Logs, Codes)
-
-    function renderUsers(users, containerId) {
-        if (!users || users.length === 0) return document.getElementById(containerId).innerHTML = '<p>No users found.</p>';
+    function renderUsers(users) {
+        const containerId = 'users-table-container';
+        const container = document.getElementById(containerId);
+        if (!users || users.length === 0) return container.innerHTML = '<p>No users found.</p>';
 
         let html = '<table><thead><tr><th>User</th><th>Email</th><th>Status</th><th>Limit</th><th>Used</th><th>Expires</th><th>Action</th></tr></thead><tbody>';
         
@@ -353,7 +357,8 @@
             </tr>`;
         });
         html += '</tbody></table>';
-        document.getElementById(containerId).innerHTML = html;
+        container.innerHTML = html;
+        document.getElementById('user-status-msg').style.display = 'none'; // Hide loading message
     }
     
     function renderCodes(codes) {
@@ -375,10 +380,12 @@
         });
         html += '</tbody></table>';
         container.innerHTML = html;
+        document.getElementById('code-review-status-msg').style.display = 'none'; // Hide loading message
     }
-    
+
     function renderLogs(logs, containerId) {
-        if (!logs || logs.length === 0) return document.getElementById(containerId).innerHTML = '<p>No system logs found.</p>';
+        const container = document.getElementById(containerId);
+        if (!logs || logs.length === 0) return container.innerHTML = '<p>No system logs found.</p>';
         
         let html = '<table><thead><tr><th>Time</th><th>User</th><th>Status</th><th>Endpoint</th><th>Details</th></tr></thead><tbody>';
         logs.forEach(l => {
@@ -392,11 +399,13 @@
             </tr>`;
         });
         html += '</tbody></table>';
-        document.getElementById(containerId).innerHTML = html;
+        container.innerHTML = html;
+        document.getElementById('log-status-msg').style.display = 'none'; // Hide loading message
     }
 
 
-    // 5. Suspend User Action (CONNECTED TO BACKEND ENDPOINT)
+    // 4. Action Handlers (Suspend/Remove)
+
     window.suspendUser = async (userId, action) => {
         const confirmMsg = action === 'SUSPEND' ? 'suspend' : 're-activate';
         if (!confirm(`Are you sure you want to ${confirmMsg} user ${userId}?`)) return;
@@ -423,7 +432,6 @@
         }
     };
     
-    // 6. Remove Code Action
     window.removeCode = async (codeId) => {
          if (!confirm(`Are you sure you want to PERMANENTLY remove code ID ${codeId}?`)) return;
 
@@ -450,14 +458,12 @@
 
 
     const fetchUsers = () => fetchData(ADMIN_USERS_API, 'user-status-msg', renderUsers);
-    // 💡 NOTE: FetchCodes needs a dedicated endpoint to list all codes. Assume the backend provides it.
     const fetchCodes = () => fetchData(ADMIN_CODE_REVIEW_API, 'code-review-status-msg', renderCodes);
     const fetchLogs = () => fetchData(ADMIN_LOGS_API, 'log-status-msg', renderLogs);
 
 
     // --- Initialization Check ---
-    document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
-
+    
     // Initial check for existing token
     if (adminToken) {
         fetch(ADMIN_USER_INFO_API, { headers: { 'Authorization': `Bearer ${adminToken}` } })
