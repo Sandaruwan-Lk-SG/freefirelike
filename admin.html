@@ -7,32 +7,34 @@
     <style>
         /* Base and Layout */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 0; background-color: #f4f7f6; color: #333; }
-        .main-wrapper { display: flex; max-width: 1200px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); min-height: 80vh; }
-        h1 { color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .main-wrapper { display: flex; max-width: 1200px; margin: 20px auto; background: white; padding: 0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); min-height: 80vh; }
+        h1 { color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; margin: 20px 0; }
         
         /* Side Navigation (Sidebar) */
         .sidebar { 
-            width: 220px; 
+            width: 250px; 
             background-color: #2c3e50; /* Dark Blue/Gray */
             color: white; 
             padding: 20px 0;
             border-radius: 12px 0 0 12px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
         .sidebar button {
             width: 100%;
             text-align: left;
-            padding: 15px 20px;
+            padding: 15px 25px;
             border: none;
             background: none;
             color: #ecf0f1;
             cursor: pointer;
             transition: background-color 0.2s;
             font-weight: 600;
+            font-size: 1.0em;
         }
         .sidebar button:hover, .sidebar button.nav-active {
-            background-color: #34495e; /* Slightly lighter on hover */
-            border-left: 5px solid #d9534f; /* Red active indicator */
-            padding-left: 15px;
+            background-color: #34495e;
+            border-left: 5px solid #d9534f;
+            padding-left: 20px;
         }
         .logout-btn { 
             background-color: #e74c3c !important; 
@@ -47,13 +49,18 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; word-break: break-word; }
         th { background-color: #f2f2f2; }
+        .status-success { color: green; font-weight: bold; }
+        .status-error { color: red; font-weight: bold; }
+        .status-limit { color: orange; }
         .status-fraud { background-color: #ffcccc; color: red; }
         
         /* Forms */
         .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
         input[type="text"], input[type="password"], input[type="number"], select { padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
         .action-button { background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; }
-        .remove-btn { background-color: #e74c3c; width: auto; padding: 6px 12px; font-size: 0.8em; }
+        .user-action-btn { background-color: #e67e22; width: auto; padding: 6px 12px; font-size: 0.8em; }
+        .suspend { background-color: #e74c3c; }
+        .suspend:hover { background-color: #c0392b; }
 
         /* Status Messages */
         .status-msg { padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold; display: none; }
@@ -79,7 +86,7 @@
     <div id="dashboard-layout" class="main-wrapper" style="display: none;">
         
         <div class="sidebar">
-            <h3 style="padding: 0 20px; color: #ff4d4d;">Control Panel</h3>
+            <h3 style="padding: 0 20px; color: #ff4d4d; margin-bottom: 30px;">FF Admin Control</h3>
             <button id="nav-codes" onclick="showAdminSection('codes')" class="nav-active">➕ Code Generator</button>
             <button id="nav-users" onclick="showAdminSection('users')">👥 Manage Users</button>
             <button id="nav-logs" onclick="showAdminSection('logs')">📊 System Logs</button>
@@ -96,20 +103,25 @@
                     <div class="input-group">
                         <label style="width: 30%;">Requests/Day: <input type="number" id="requests" min="1" max="100" required value="50"></label>
                         <label style="width: 30%;">Duration (Days): <select id="days" required><option value="7">7 Days</option><option value="30">30 Days</option><option value="365">365 Days</option></select></label>
-                        <label style="width: 40%;">Admin Key (Auto-Filled): <input type="password" id="dummyKey" disabled value="Encrypted"></label>
+                        <label style="width: 40%;">Admin Key (Auto-Filled): <input type="password" id="dummyKey" disabled value="Secured"></label>
                     </div>
                     <button type="submit" style="background-color: #d9534f;">Generate and Save Code</button>
                 </form>
-                <p id="code-status" class="status-msg"></p>
+                <p id="code-status" class="status-msg" style="display:none;"></p>
                 <div id="code-output-box" class="generated-code-box" style="display:none;">
                     <p>Generated Code:</p>
                     <code id="generatedCode" onclick="copyCode(this)">CODE HERE</code>
                     <p style="font-size: 0.8em; color: #333;">Click to Copy | Limit: <span id="limitValue"></span> reqs / Days: <span id="daysValue"></span></p>
                 </div>
+                
+                <h4 style="margin-top: 30px;">Code Review (Last 20 Codes)</h4>
+                <p id="code-review-status-msg" class="status-msg">Loading codes...</p>
+                <div id="code-review-table-container" class="data-section"></div>
+
             </div>
             
             <div id="users-section" class="content-section" style="display: none;">
-                <h3>User Management</h3>
+                <h3>User Management (Suspend/Activate)</h3>
                 <div class="input-group">
                     <input type="text" id="userSearch" placeholder="Search by Username, Email or ID...">
                     <button onclick="fetchUsers()">Search/Refresh</button>
@@ -127,11 +139,6 @@
             <div id="stats-section" class="content-section" style="display: none;">
                 <h3>Daily/Monthly Data Review</h3>
                 <p>This section will show charts and aggregate statistics (Requires advanced backend logic and aggregation).</p>
-                <ul>
-                    <li>Total Users: <span id="totalUsers">0</span></li>
-                    <li>Active Premium: <span id="activePremium">0</span></li>
-                    <li>Today's Fraud Attempts: <span id="todayFraud">0</span></li>
-                </ul>
             </div>
 
         </div>
@@ -145,9 +152,10 @@
     const ADMIN_GENERATE_API = `${BASE_URL}/api/admin/generate-code`;
     const ADMIN_USERS_API = `${BASE_URL}/api/admin/users`;
     const ADMIN_LOGS_API = `${BASE_URL}/api/admin/logs`;
-    const ADMIN_USER_INFO_API = `${BASE_URL}/api/user-info`;
-    const ADMIN_SUSPEND_API = `${BASE_URL}/api/admin/suspend-user`; // 💡 NEW: Conceptual Endpoint
-    const ADMIN_REMOVE_CODE_API = `${BASE_URL}/api/admin/remove-code`; // 💡 NEW: Conceptual Endpoint
+    const ADMIN_CODE_REVIEW_API = `${BASE_URL}/api/admin/codes`; // 💡 NEW: Conceptual Endpoint for code review
+    const ADMIN_USER_INFO_API = `${BASE_URL}/api/user-info`; 
+    const ADMIN_SUSPEND_API = `${BASE_URL}/api/admin/suspend-user`; 
+    const ADMIN_REMOVE_CODE_API = `${BASE_URL}/api/admin/remove-code`; 
 
     let adminToken = localStorage.getItem('adminToken');
     let adminData = null;
@@ -180,8 +188,10 @@
         document.getElementById('nav-' + sectionId).classList.add('nav-active');
 
         // Load data specific to the section
+        if (sectionId === 'codes') fetchCodes(); 
         if (sectionId === 'users') fetchUsers();
         if (sectionId === 'logs') fetchLogs();
+        // Stats section remains conceptual for now
     }
     
     function copyCode(element) {
@@ -193,22 +203,33 @@
         });
     }
 
-    // --- Feature Logic (Needs Backend) ---
+    function adminLogout() {
+        localStorage.removeItem('adminToken');
+        adminToken = null;
+        adminData = null;
+        setAuthStatus(false);
+        document.getElementById('admin-login-status').textContent = 'Logged out.';
+    }
 
-    // 1. Authenticate Admin (Reusing main login endpoint)
+    // --- Authentication Logic (FIXED HANDLER) ---
+
     document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
+        e.preventDefault(); // 💡 CRITICAL FIX: Prevent page reload
+        
         const email = document.getElementById('admin-email').value;
         const password = document.getElementById('admin-password').value;
         const statusEl = document.getElementById('admin-login-status');
         
         statusEl.textContent = 'Logging in...';
+        statusEl.style.display = 'block';
+        
         const deviceId = 'ADMIN_DEVICE_FINGERPRINT_SKIP'; 
 
         try {
             const response = await fetch(ADMIN_LOGIN_API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                // Use email/password and dummy deviceId
                 body: JSON.stringify({ email, password, deviceId }) 
             });
 
@@ -224,19 +245,26 @@
                     adminToken = data.token;
                     adminData = userData;
                     setAuthStatus(true, userData.username);
+                    statusEl.textContent = 'Login successful!';
+                    statusEl.className = 'status-msg status-success';
                 } else {
-                    statusEl.textContent = 'Login failed: Insufficient permissions (Not Admin).';
+                    // Block access if token is valid but role is not 'admin'
+                    statusEl.textContent = 'Login failed: Insufficient permissions (You are not an Admin).';
+                    statusEl.className = 'status-msg status-error';
                     localStorage.removeItem('adminToken');
                 }
             } else {
                 statusEl.textContent = data.message || 'Login failed: Invalid credentials.';
+                statusEl.className = 'status-msg status-error';
             }
         } catch (error) {
             statusEl.textContent = 'Network error during login.';
+            statusEl.className = 'status-msg status-error';
+            console.error(error);
         }
     });
 
-    // 2. Generate Code
+    // 2. Generate Code Logic
     document.getElementById('generatorForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const requestsPerDay = parseInt(document.getElementById('requests').value);
@@ -246,7 +274,7 @@
         if (!adminToken) return updateStatus('code-status', 'Error: Authentication required.', false);
 
         statusEl.textContent = 'Generating...';
-        document.getElementById('generateBtn').disabled = true;
+        document.querySelector('#generatorForm button').disabled = true;
 
         try {
             const response = await fetch(ADMIN_GENERATE_API, {
@@ -264,6 +292,7 @@
                 
                 document.getElementById('code-output-box').style.display = 'block';
                 updateStatus('code-status', "SUCCESS! Code saved to database. Click code to copy.", true);
+                fetchCodes(); // Refresh code review table
             } else {
                 updateStatus('code-status', `Error: ${data.message || 'Generation failed. Check server logs.'}`, false);
                 document.getElementById('code-output-box').style.display = 'none';
@@ -271,48 +300,53 @@
         } catch (error) {
             updateStatus('code-status', 'Network Error. Could not generate code.', false);
         } finally {
-            document.getElementById('generateBtn').disabled = false;
+            document.querySelector('#generatorForm button').disabled = false;
         }
     });
 
 
-    // 3. Manage Users (Display and Action)
-    
-    async function fetchUsers() {
-        if (!adminToken) return updateStatus('user-status-msg', 'Authentication required.', false);
-        updateStatus('user-status-msg', 'Loading user data...', false);
-        
+    // 3. Data Fetching Core
+    async function fetchData(api, statusElId, renderFunction) {
+        if (!adminToken) return updateStatus(statusElId, 'Authentication required.', false);
+        document.getElementById(statusElId).textContent = 'Loading...';
+
         try {
-            const response = await fetch(ADMIN_USERS_API, { headers: { 'Authorization': `Bearer ${adminToken}` } });
-            if (response.status === 403) throw new Error("ACCESS DENIED.");
-            const users = await response.json();
+            const response = await fetch(api, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+            if (response.status === 403) throw new Error("ACCESS DENIED: Token invalid or insufficient permissions.");
             
-            updateStatus('user-status-msg', 'Data loaded successfully.', true);
-            renderUsers(users, 'users-table-container');
+            const data = await response.json();
+            
+            updateStatus(statusElId, 'Data loaded successfully.', true);
+            renderFunction(data, 'users-table-container');
 
         } catch(error) {
-            updateStatus('user-status-msg', `Error fetching data: ${error.message}`, false);
-            if (error.message.includes("ACCESS DENIED")) adminLogout();
+            updateStatus(statusElId, `Error fetching data: ${error.message}`, false);
+            if (error.message.includes("ACCESS DENIED") || error.message.includes("Token invalid")) adminLogout();
         }
     }
+
+    // 4. Render Functions (Users, Logs, Codes)
 
     function renderUsers(users, containerId) {
         if (!users || users.length === 0) return document.getElementById(containerId).innerHTML = '<p>No users found.</p>';
 
-        let html = '<table><thead><tr><th>User</th><th>Email</th><th>Status</th><th>Limit</th><th>Expires</th><th>Action</th></tr></thead><tbody>';
+        let html = '<table><thead><tr><th>User</th><th>Email</th><th>Status</th><th>Limit</th><th>Used</th><th>Expires</th><th>Action</th></tr></thead><tbody>';
         
         users.forEach(u => {
             const isPremium = u.isPremium && new Date(u.premiumExpiry) > new Date();
-            const actionText = u.maxRequestsPerDay > 1 ? 'Suspend' : 'FREE';
+            const isSuspended = u.maxRequestsPerDay === 0;
+            const actionText = isSuspended ? 'Activate' : 'Suspend';
+            const actionType = isSuspended ? 'ACTIVATE' : 'SUSPEND';
+            const statusClass = isSuspended ? 'suspend' : (isPremium ? 'secondary-btn' : 'user-action-btn');
 
             html += `<tr>
                 <td><strong>${u.username}</strong></td>
                 <td>${u.email}</td>
-                <td>${isPremium ? '✅ PREMIUM' : '👤 Free'}</td>
+                <td>${isSuspended ? '🔴 SUSPENDED' : (isPremium ? '✅ PREMIUM' : '👤 Free')}</td>
                 <td>${u.requestsToday}/${u.maxRequestsPerDay}</td>
-                <td>${isPremium ? new Date(u.premiumExpiry).toLocaleDateString() : 'N/A'}</td>
+                <td>${isSuspended ? 'N/A' : (isPremium ? new Date(u.premiumExpiry).toLocaleDateString() : 'N/A')}</td>
                 <td>
-                    <button class="remove-btn" onclick="suspendUser('${u._id}', ${u.maxRequestsPerDay > 1})">
+                    <button class="user-action-btn ${statusClass}" onclick="suspendUser('${u._id}', '${actionType}')">
                         ${actionText}
                     </button>
                 </td>
@@ -321,35 +355,28 @@
         html += '</tbody></table>';
         document.getElementById(containerId).innerHTML = html;
     }
+    
+    function renderCodes(codes) {
+        const container = document.getElementById('code-review-table-container');
+        if (!codes || codes.length === 0) return container.innerHTML = '<p>No codes found in the database.</p>';
 
-    // 4. Suspend User Action (CONCEPTUAL - Needs Backend Endpoint)
-    window.suspendUser = async (userId, isPremium) => {
-        if (!confirm(`Are you sure you want to suspend user ${userId}? This will reset their limit to 1.`)) return;
-
-        // ⚠️ NEW BACKEND LOGIC REQUIRED HERE
-        updateStatus('user-status-msg', `Suspending user ${userId}...`, false);
+        let html = '<table><thead><tr><th>Code</th><th>Limit</th><th>Duration</th><th>Used By</th><th>Status</th><th>Action</th></tr></thead><tbody>';
         
-        try {
-            const response = await fetch(ADMIN_SUSPEND_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
-                body: JSON.stringify({ userId: userId }) // Backend will reset maxRequestsPerDay to 1
-            });
-            
-            if (response.ok) {
-                updateStatus('user-status-msg', `User ${userId} successfully suspended.`, true);
-                fetchUsers(); // Refresh the list
-            } else {
-                const data = await response.json();
-                updateStatus('user-status-msg', `Suspension Failed: ${data.message || 'Server error.'}`, false);
-            }
-        } catch(error) {
-            updateStatus('user-status-msg', 'Network error during suspension.', false);
-        }
-    };
-
-
-    // 5. System Logs (Display)
+        codes.forEach(c => {
+            const status = c.isUsed ? '❌ USED' : '✅ ACTIVE';
+            html += `<tr>
+                <td><strong>${c.code}</strong></td>
+                <td>${c.requestsPerDay} / ${c.validDays}d</td>
+                <td>${c.validDays} days</td>
+                <td>${c.isUsed ? (c.usedById || 'N/A') : '-'}</td>
+                <td>${status}</td>
+                <td><button class="remove-btn" onclick="removeCode('${c._id}')">Remove</button></td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+    
     function renderLogs(logs, containerId) {
         if (!logs || logs.length === 0) return document.getElementById(containerId).innerHTML = '<p>No system logs found.</p>';
         
@@ -369,11 +396,68 @@
     }
 
 
-    const fetchLogs = () => fetchData(ADMIN_LOGS_API, 'log-status-msg', 'logs-table-container', renderLogs);
+    // 5. Suspend User Action (CONNECTED TO BACKEND ENDPOINT)
+    window.suspendUser = async (userId, action) => {
+        const confirmMsg = action === 'SUSPEND' ? 'suspend' : 're-activate';
+        if (!confirm(`Are you sure you want to ${confirmMsg} user ${userId}?`)) return;
+
+        updateStatus('user-status-msg', `Processing ${action}...`, false);
+        
+        try {
+            const response = await fetch(ADMIN_SUSPEND_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ userId: userId, action: action }) 
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                updateStatus('user-status-msg', data.message, true);
+                fetchUsers(); // Refresh the list
+            } else {
+                updateStatus('user-status-msg', `Suspension Failed: ${data.message || 'Server error.'}`, false);
+            }
+        } catch(error) {
+            updateStatus('user-status-msg', 'Network error during suspension.', false);
+        }
+    };
+    
+    // 6. Remove Code Action
+    window.removeCode = async (codeId) => {
+         if (!confirm(`Are you sure you want to PERMANENTLY remove code ID ${codeId}?`)) return;
+
+         updateStatus('code-review-status-msg', `Removing code...`, false);
+         try {
+             const response = await fetch(ADMIN_REMOVE_CODE_API, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                 body: JSON.stringify({ codeId: codeId })
+             });
+
+             const data = await response.json();
+
+             if (response.ok) {
+                 updateStatus('code-review-status-msg', data.message, true);
+                 fetchCodes();
+             } else {
+                 updateStatus('code-review-status-msg', `Removal Failed: ${data.message || 'Server error.'}`, false);
+             }
+         } catch (error) {
+             updateStatus('code-review-status-msg', 'Network error during code removal.', false);
+         }
+    };
+
+
+    const fetchUsers = () => fetchData(ADMIN_USERS_API, 'user-status-msg', renderUsers);
+    // 💡 NOTE: FetchCodes needs a dedicated endpoint to list all codes. Assume the backend provides it.
+    const fetchCodes = () => fetchData(ADMIN_CODE_REVIEW_API, 'code-review-status-msg', renderCodes);
+    const fetchLogs = () => fetchData(ADMIN_LOGS_API, 'log-status-msg', renderLogs);
 
 
     // --- Initialization Check ---
     document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+
     // Initial check for existing token
     if (adminToken) {
         fetch(ADMIN_USER_INFO_API, { headers: { 'Authorization': `Bearer ${adminToken}` } })
