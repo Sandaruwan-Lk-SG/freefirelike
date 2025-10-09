@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Like System - Premium Access</title>
+    <title>Free Fire Likes System - Premium Access</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
     
     <style>
-        /* General Reset and Base Styling */
+        /* Base Styling */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             padding: 20px; 
@@ -32,7 +32,7 @@
         h1 { color: #d9534f; margin-bottom: 10px; }
         .description { color: #555; margin-bottom: 25px; font-size: 0.95em; }
         
-        /* 💡 NEW: Admin Link Header */
+        /* Admin Link Header */
         #admin-link-bar {
             position: fixed;
             top: 0;
@@ -53,7 +53,7 @@
             transition: background-color 0.2s;
         }
 
-        /* 💡 Navigation Tabs FIX */
+        /* Navigation Tabs (Fixed) */
         #nav-tabs { 
             display: flex; 
             justify-content: space-between; 
@@ -64,19 +64,16 @@
             background: none;
             border: none;
             color: #555;
-            flex-grow: 1; /* Allow buttons to grow equally */
-            padding: 12px 2px; /* Increased vertical padding, reduced horizontal */
+            flex-grow: 1; 
+            padding: 12px 2px; 
             margin: 0 1px;
             font-weight: 600;
-            font-size: 0.9em; /* Reduced font size for better fit on mobile */
-            white-space: nowrap; /* Prevent line breaks within the tab */
+            font-size: 0.9em; 
+            white-space: nowrap; 
             border-bottom: 3px solid transparent;
             transition: color 0.2s, border-bottom 0.2s;
         }
-        .nav-active {
-            color: #d9534f !important;
-            border-bottom: 3px solid #d9534f !important;
-        }
+        .nav-active { color: #d9534f !important; border-bottom: 3px solid #d9534f !important; }
 
         /* Inputs and Buttons */
         input[type="text"], input[type="password"], select { 
@@ -91,27 +88,24 @@
         .secondary-btn { background-color: #5cb85c; }
         .secondary-btn:hover { background-color: #449d44; }
 
-        /* 💡 NEW: Stylish Response Box */
+        /* Status and Messages */
+        #user-status { margin-bottom: 15px; font-weight: bold; }
+        .user-premium-text { color: #ff4d4d; }
+        .message-box { padding: 10px; margin-top: 10px; border-radius: 6px; font-weight: bold; display: none;}
+        .success-msg { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-msg { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Text Art Output */
         #result { 
-            margin-top: 15px; 
-            padding: 15px; 
-            border: 2px solid #333; 
-            white-space: pre; 
-            background-color: #1a1a1a; 
-            color: #00ff40; 
-            border-radius: 8px; 
-            font-size: 0.9em; 
-            overflow-x: auto;
-            font-family: 'Consolas', 'Courier New', Courier, monospace; 
-            line-height: 1.25; 
+            white-space: pre; background-color: #222; color: #00ff00; border: 1px solid #d9534f; 
+            padding: 15px; border-radius: 6px; font-size: 0.9em; overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace; line-height: 1.25; 
             text-align: left;
-            box-shadow: inset 0 0 5px rgba(0, 255, 64, 0.5);
         }
-        .error-box { 
-            background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px;
-            word-wrap: break-word; white-space: normal;
-        }
+        /* Mobile Friendly Error Box Styling */
+        .error-box { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px; word-wrap: break-word; white-space: normal; }
         .error-box .error-text { color: #721c24; font-weight: bold; font-family: Arial, sans-serif; display: block; }
+        .contact-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: left; font-size: 0.9em; color: #555; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -446,6 +440,7 @@
 
 
     function logoutUser() {
+        // ... (Logout logic remains the same) ...
         localStorage.removeItem('jwtToken');
         updateNavAndStatus(null);
         showSection('auth'); 
@@ -515,7 +510,7 @@
         }
     });
     
-    // --- Other UI/API Logic (renderPackages, selectPackage, redeemCode, handleErrorResponse, formatResponseToTextArt) ---
+    // --- Other UI/API Logic (Packages, Redeem, API Call) ---
 
     function renderPackages() { 
         const listContainer = document.getElementById('package-cards-container');
@@ -597,10 +592,11 @@
     }
 
 
-    function handleErrorResponse(errorMessage, statusCode) { 
+    function handleErrorResponse(errorMessage, statusCode) {
         if (statusCode === 429) { return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM SLT.`; }
         
         const errorText = String(errorMessage).toLowerCase();
+
         if (errorText.includes("fraud attempt detected")) {
              return "FRAUD ATTEMPT DETECTED: It appears you are attempting to cheat. This account or device has already claimed the daily limit. Our policy against cheating is zero tolerance. If this is an honest mistake, please contact us via email to resolve the issue. Fraudulent requests will be rejected.";
         }
@@ -693,20 +689,18 @@
     // --- FINAL EVENT LISTENERS ---
     document.getElementById('loginForm').addEventListener('submit', (e) => {
         e.preventDefault(); 
-        document.getElementById('auth-message').style.display = 'none'; // Clear previous messages
-        document.getElementById('verify-form').style.display = 'none';
-        
-        // Manual form data check included in the event listener body above
+        document.getElementById('auth-message').style.display = 'none'; 
+        handleAuth(e); // Login Handler calls handleAuth
     });
     
     document.getElementById('requestCodeForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        // Logic is within the body of the function above
+        // Logic is inline above
     });
 
     document.getElementById('verifyCodeForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        // Logic is within the body of the function above
+        // Logic is inline above
     });
 
 
