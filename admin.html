@@ -3,134 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN DASHBOARD - FF LIKES</title>
+    <title>ADMIN DASHBOARD - FF LIKES SYSTEM</title>
     <style>
+        /* Base and Layout */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 0; background-color: #f4f7f6; color: #333; }
-        .admin-container { max-width: 1100px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .main-wrapper { display: flex; max-width: 1200px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); min-height: 80vh; }
         h1 { color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
         
-        /* Navigation & Tabs */
-        .nav-tabs button { padding: 10px 15px; margin-right: 5px; border: none; background: #eee; cursor: pointer; font-weight: 600; }
-        .nav-active { background: #d9534f !important; color: white !important; }
-        .logout-btn { background-color: #333; color: white; float: right; padding: 8px; margin-top: -10px; }
+        /* Side Navigation (Sidebar) */
+        .sidebar { 
+            width: 220px; 
+            background-color: #2c3e50; /* Dark Blue/Gray */
+            color: white; 
+            padding: 20px 0;
+            border-radius: 12px 0 0 12px;
+        }
+        .sidebar button {
+            width: 100%;
+            text-align: left;
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 600;
+        }
+        .sidebar button:hover, .sidebar button.nav-active {
+            background-color: #34495e; /* Slightly lighter on hover */
+            border-left: 5px solid #d9534f; /* Red active indicator */
+            padding-left: 15px;
+        }
+        .logout-btn { 
+            background-color: #e74c3c !important; 
+            margin-top: 30px; 
+        }
+
+        /* Content Area */
+        .content-area { flex-grow: 1; padding: 30px; }
         
-        /* Content Sections */
-        .content-section { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 6px; text-align: left; }
-        .data-section { max-height: 400px; overflow-y: auto; }
-        
-        /* Forms and Input */
-        .input-group { display: flex; gap: 15px; margin-bottom: 20px; }
-        .input-group label { width: 100%; }
-        input[type="number"], select { padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
-        
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85em; }
+        /* Data Tables */
+        .data-section { max-height: 500px; overflow-y: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; word-break: break-word; }
         th { background-color: #f2f2f2; }
-        .status-success { color: green; font-weight: bold; }
-        .status-error { color: red; font-weight: bold; }
-        .status-limit { color: orange; }
         .status-fraud { background-color: #ffcccc; color: red; }
+        
+        /* Forms */
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="text"], input[type="password"], input[type="number"], select { padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        .action-button { background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        .remove-btn { background-color: #e74c3c; width: auto; padding: 6px 12px; font-size: 0.8em; }
 
-        /* Login Screen */
-        #admin-login-section { width: 400px; margin: 50px auto; text-align: center; }
+        /* Status Messages */
+        .status-msg { padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold; display: none; }
+        .status-success { background-color: #dff0d8; color: #3c763d; }
+        .status-error { background-color: #f2dede; color: #a94442; }
     </style>
 </head>
 <body>
 
-<div class="admin-container" id="main-app">
-    <h1 id="welcome-header">Admin Dashboard - Loading...</h1>
-    
-    <div id="admin-nav" class="nav-tabs" style="display: none; margin-bottom: 20px;">
-        <button id="nav-codes" onclick="showAdminSection('codes')" class="nav-active">Code Generator</button>
-        <button id="nav-users" onclick="showAdminSection('users')">Manage Users</button>
-        <button id="nav-logs" onclick="showAdminSection('logs')">System Logs</button>
-        <button class="logout-btn" onclick="adminLogout()">Logout</button>
-    </div>
-
-    <div id="admin-login-section" class="content-section" style="display: none;">
-        <h3>Admin Login</h3>
+<div id="app-wrapper">
+    <div id="admin-login-section" class="content-section" style="width: 400px; margin: 50px auto;">
+        <h1>Admin Login</h1>
         <form id="adminLoginForm">
             <label for="admin-email">Email:</label>
             <input type="text" id="admin-email" required placeholder="Enter Admin Email">
             <label for="admin-password">Password:</label>
             <input type="password" id="admin-password" required placeholder="Enter Admin Password">
-            <button type="submit">Login</button>
-            <p id="admin-login-status" style="margin-top: 10px;"></p>
+            <button type="submit" style="background-color: #d9534f;">Login</button>
+            <p id="admin-login-status" class="status-msg" style="display:none;"></p>
         </form>
     </div>
 
-    <div id="codes-section" class="content-section">
-        <h3>Generate Premium Codes</h3>
-        <form id="generatorForm">
-            <div class="input-group">
-                <label style="width: 50%;">
-                    Daily Requests (Max):
-                    <input type="number" id="requests" min="1" max="100" required value="50">
-                </label>
-                <label style="width: 50%;">
-                    Duration (Days):
-                    <select id="days" required>
-                        <option value="7">7 Days (Weekly)</option>
-                        <option value="30">30 Days (Monthly)</option>
-                        <option value="365">365 Days (Yearly)</option>
-                    </select>
-                </label>
-            </div>
-            <button type="submit" style="background-color: #d9534f;">Generate and Save Code</button>
-        </form>
-        <div id="code-output-box" class="generated-code-box" style="display:none;">
-            Generated: <code id="generatedCode">CODE_HERE</code>
+    <div id="dashboard-layout" class="main-wrapper" style="display: none;">
+        
+        <div class="sidebar">
+            <h3 style="padding: 0 20px; color: #ff4d4d;">Control Panel</h3>
+            <button id="nav-codes" onclick="showAdminSection('codes')" class="nav-active">➕ Code Generator</button>
+            <button id="nav-users" onclick="showAdminSection('users')">👥 Manage Users</button>
+            <button id="nav-logs" onclick="showAdminSection('logs')">📊 System Logs</button>
+            <button id="nav-stats" onclick="showAdminSection('stats')">📈 Data Review</button>
+            <button class="logout-btn" onclick="adminLogout()">🔒 Log Out</button>
         </div>
-        <p id="code-status" class="status-msg" style="display:none;"></p>
-    </div>
-    
-    <div id="users-section" class="content-section" style="display: none;">
-        <h3>Registered Users</h3>
-        <p id="user-status-msg">Loading user data...</p>
-        <div id="users-table-container" class="data-section"></div>
-    </div>
-    
-    <div id="logs-section" class="content-section" style="display: none;">
-        <h3>System Logs (Last 100 Requests)</h3>
-        <p id="log-status-msg">Loading log data...</p>
-        <div id="logs-table-container" class="data-section"></div>
-    </div>
+        
+        <div class="content-area">
+            <h1 id="welcome-header">Welcome, Admin</h1>
 
+            <div id="codes-section" class="content-section">
+                <h3>Code Generation & Management</h3>
+                <form id="generatorForm">
+                    <div class="input-group">
+                        <label style="width: 30%;">Requests/Day: <input type="number" id="requests" min="1" max="100" required value="50"></label>
+                        <label style="width: 30%;">Duration (Days): <select id="days" required><option value="7">7 Days</option><option value="30">30 Days</option><option value="365">365 Days</option></select></label>
+                        <label style="width: 40%;">Admin Key (Auto-Filled): <input type="password" id="dummyKey" disabled value="Encrypted"></label>
+                    </div>
+                    <button type="submit" style="background-color: #d9534f;">Generate and Save Code</button>
+                </form>
+                <p id="code-status" class="status-msg"></p>
+                <div id="code-output-box" class="generated-code-box" style="display:none;">
+                    <p>Generated Code:</p>
+                    <code id="generatedCode" onclick="copyCode(this)">CODE HERE</code>
+                    <p style="font-size: 0.8em; color: #333;">Click to Copy | Limit: <span id="limitValue"></span> reqs / Days: <span id="daysValue"></span></p>
+                </div>
+            </div>
+            
+            <div id="users-section" class="content-section" style="display: none;">
+                <h3>User Management</h3>
+                <div class="input-group">
+                    <input type="text" id="userSearch" placeholder="Search by Username, Email or ID...">
+                    <button onclick="fetchUsers()">Search/Refresh</button>
+                </div>
+                <p id="user-status-msg" class="status-msg">Loading user data...</p>
+                <div id="users-table-container" class="data-section"></div>
+            </div>
+            
+            <div id="logs-section" class="content-section" style="display: none;">
+                <h3>System Logs (Last 100 Requests)</h3>
+                <p id="log-status-msg" class="status-msg">Loading log data...</p>
+                <div id="logs-table-container" class="data-section"></div>
+            </div>
+
+            <div id="stats-section" class="content-section" style="display: none;">
+                <h3>Daily/Monthly Data Review</h3>
+                <p>This section will show charts and aggregate statistics (Requires advanced backend logic and aggregation).</p>
+                <ul>
+                    <li>Total Users: <span id="totalUsers">0</span></li>
+                    <li>Active Premium: <span id="activePremium">0</span></li>
+                    <li>Today's Fraud Attempts: <span id="todayFraud">0</span></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script>
     // --- Configuration (MUST MATCH server.js) ---
     const BASE_URL = 'https://freefirewebbackend-production.up.railway.app';
-    const ADMIN_LOGIN_API = `${BASE_URL}/api/login`; // Reusing Login endpoint
+    const ADMIN_LOGIN_API = `${BASE_URL}/api/login`; 
     const ADMIN_GENERATE_API = `${BASE_URL}/api/admin/generate-code`;
     const ADMIN_USERS_API = `${BASE_URL}/api/admin/users`;
     const ADMIN_LOGS_API = `${BASE_URL}/api/admin/logs`;
-    const ADMIN_USER_INFO_API = `${BASE_URL}/api/user-info`; // To confirm role after login
+    const ADMIN_USER_INFO_API = `${BASE_URL}/api/user-info`;
+    const ADMIN_SUSPEND_API = `${BASE_URL}/api/admin/suspend-user`; // 💡 NEW: Conceptual Endpoint
+    const ADMIN_REMOVE_CODE_API = `${BASE_URL}/api/admin/remove-code`; // 💡 NEW: Conceptual Endpoint
 
     let adminToken = localStorage.getItem('adminToken');
     let adminData = null;
 
-    // --- Core Functions ---
+    // --- Utility Functions ---
     
-    function getAdminToken() {
-        return localStorage.getItem('adminToken');
+    function updateStatus(elementId, message, isSuccess = false) {
+        const el = document.getElementById(elementId);
+        el.textContent = message;
+        el.className = isSuccess ? 'status-msg status-success' : 'status-msg status-error';
+        el.style.display = 'block';
     }
-    
+
     function setAuthStatus(isLoggedIn, username = '') {
-        const adminSection = document.getElementById('admin-login-section');
-        const navSection = document.getElementById('admin-nav');
+        const loginSection = document.getElementById('admin-login-section');
+        const dashboard = document.getElementById('dashboard-layout');
         
-        document.getElementById('welcome-header').textContent = isLoggedIn ? `Admin Dashboard - Welcome, ${username}` : 'Admin Dashboard - Please Login';
-        adminSection.style.display = isLoggedIn ? 'none' : 'block';
-        navSection.style.display = isLoggedIn ? 'flex' : 'none';
+        document.getElementById('welcome-header').textContent = isLoggedIn ? `Welcome, ${username} (Root Admin)` : 'Admin Dashboard - Please Login';
+        loginSection.style.display = isLoggedIn ? 'none' : 'block';
+        dashboard.style.display = isLoggedIn ? 'flex' : 'none';
         
         if (isLoggedIn) showAdminSection('codes');
     }
-
+    
     function showAdminSection(sectionId) {
         document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.nav-tabs button').forEach(el => el.classList.remove('nav-active'));
+        document.querySelectorAll('.sidebar button').forEach(el => el.classList.remove('nav-active'));
 
         document.getElementById(sectionId + '-section').style.display = 'block';
         document.getElementById('nav-' + sectionId).classList.add('nav-active');
@@ -140,25 +184,25 @@
         if (sectionId === 'logs') fetchLogs();
     }
     
-    function adminLogout() {
-        localStorage.removeItem('adminToken');
-        adminToken = null;
-        adminData = null;
-        setAuthStatus(false);
-        document.getElementById('admin-login-status').textContent = 'Logged out.';
+    function copyCode(element) {
+        const code = element.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            alert(`Code copied: ${code}`);
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+        });
     }
 
-    // --- Authentication Logic ---
+    // --- Feature Logic (Needs Backend) ---
 
-    async function handleAdminLogin(e) {
+    // 1. Authenticate Admin (Reusing main login endpoint)
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const email = document.getElementById('admin-email').value;
         const password = document.getElementById('admin-password').value;
         const statusEl = document.getElementById('admin-login-status');
         
         statusEl.textContent = 'Logging in...';
-        
-        // CRITICAL: Dummy Device ID required by the backend Login endpoint
         const deviceId = 'ADMIN_DEVICE_FINGERPRINT_SKIP'; 
 
         try {
@@ -172,9 +216,7 @@
 
             if (response.ok && data.token) {
                 // Verify Admin Role using the issued token
-                const userResponse = await fetch(ADMIN_USER_INFO_API, {
-                    headers: { 'Authorization': `Bearer ${data.token}` }
-                });
+                const userResponse = await fetch(ADMIN_USER_INFO_API, { headers: { 'Authorization': `Bearer ${data.token}` } });
                 const userData = await userResponse.json();
 
                 if (userResponse.ok && userData.role === 'admin') {
@@ -182,30 +224,26 @@
                     adminToken = data.token;
                     adminData = userData;
                     setAuthStatus(true, userData.username);
-                    statusEl.textContent = '';
                 } else {
-                    statusEl.textContent = 'Login successful, but you do not have Admin privileges.';
+                    statusEl.textContent = 'Login failed: Insufficient permissions (Not Admin).';
                     localStorage.removeItem('adminToken');
                 }
             } else {
                 statusEl.textContent = data.message || 'Login failed: Invalid credentials.';
             }
         } catch (error) {
-            statusEl.textContent = 'Network error: Could not connect to the server.';
-            console.error(error);
+            statusEl.textContent = 'Network error during login.';
         }
-    }
-    
-    // --- Data Management Logic ---
+    });
 
-    // 1. Generate Code Logic
+    // 2. Generate Code
     document.getElementById('generatorForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         const requestsPerDay = parseInt(document.getElementById('requests').value);
         const validDays = parseInt(document.getElementById('days').value);
         const statusEl = document.getElementById('code-status');
         
-        if (!getAdminToken()) return statusEl.textContent = 'Authentication required.';
+        if (!adminToken) return updateStatus('code-status', 'Error: Authentication required.', false);
 
         statusEl.textContent = 'Generating...';
         document.getElementById('generateBtn').disabled = true;
@@ -213,10 +251,7 @@
         try {
             const response = await fetch(ADMIN_GENERATE_API, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getAdminToken()}` 
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
                 body: JSON.stringify({ requestsPerDay, validDays })
             });
 
@@ -228,77 +263,105 @@
                 document.getElementById('daysValue').textContent = data.days;
                 
                 document.getElementById('code-output-box').style.display = 'block';
-                statusEl.textContent = "SUCCESS! Code saved to database. Send this code to the customer.";
-                statusEl.className = 'status-msg status-success';
+                updateStatus('code-status', "SUCCESS! Code saved to database. Click code to copy.", true);
             } else {
-                statusEl.textContent = `Error: ${data.message || 'Generation failed. Check server logs.'}`;
-                statusEl.className = 'status-msg status-error';
+                updateStatus('code-status', `Error: ${data.message || 'Generation failed. Check server logs.'}`, false);
                 document.getElementById('code-output-box').style.display = 'none';
             }
         } catch (error) {
-            statusEl.textContent = 'Network Error. Could not generate code.';
-            statusEl.className = 'status-msg status-error';
+            updateStatus('code-status', 'Network Error. Could not generate code.', false);
         } finally {
             document.getElementById('generateBtn').disabled = false;
         }
     });
-    
-    // 2. Fetch Users and Logs (Data Viewing)
-    
-    async function fetchData(api, statusElId, tableContainerId, renderFunction) {
-        document.getElementById(statusElId).textContent = 'Loading...';
-        document.getElementById(tableContainerId).innerHTML = '';
 
+
+    // 3. Manage Users (Display and Action)
+    
+    async function fetchUsers() {
+        if (!adminToken) return updateStatus('user-status-msg', 'Authentication required.', false);
+        updateStatus('user-status-msg', 'Loading user data...', false);
+        
         try {
-            const response = await fetch(api, {
-                headers: { 'Authorization': `Bearer ${getAdminToken()}` }
-            });
-
-            if (response.status === 403) throw new Error("ADMIN ACCESS DENIED: Token invalid or insufficient permissions.");
+            const response = await fetch(ADMIN_USERS_API, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+            if (response.status === 403) throw new Error("ACCESS DENIED.");
+            const users = await response.json();
             
-            const data = await response.json();
-            
-            document.getElementById(statusElId).textContent = '';
-            renderFunction(data, tableContainerId);
+            updateStatus('user-status-msg', 'Data loaded successfully.', true);
+            renderUsers(users, 'users-table-container');
 
         } catch(error) {
-            document.getElementById(statusElId).textContent = `Error: ${error.message}`;
-            if (error.message.includes("ADMIN ACCESS DENIED") || error.message.includes("Token invalid")) adminLogout();
+            updateStatus('user-status-msg', `Error fetching data: ${error.message}`, false);
+            if (error.message.includes("ACCESS DENIED")) adminLogout();
         }
     }
 
     function renderUsers(users, containerId) {
         if (!users || users.length === 0) return document.getElementById(containerId).innerHTML = '<p>No users found.</p>';
 
-        let html = '<table><thead><tr><th>User ID</th><th>Username</th><th>Premium?</th><th>Limit</th><th>Used</th><th>Expires</th></tr></thead><tbody>';
+        let html = '<table><thead><tr><th>User</th><th>Email</th><th>Status</th><th>Limit</th><th>Expires</th><th>Action</th></tr></thead><tbody>';
         
         users.forEach(u => {
             const isPremium = u.isPremium && new Date(u.premiumExpiry) > new Date();
+            const actionText = u.maxRequestsPerDay > 1 ? 'Suspend' : 'FREE';
+
             html += `<tr>
-                <td>${u._id.substring(0, 8)}...</td>
                 <td><strong>${u.username}</strong></td>
-                <td>${isPremium ? '✅' : '❌'}</td>
-                <td>${u.maxRequestsPerDay}</td>
-                <td>${u.requestsToday}</td>
-                <td>${isPremium ? new Date(u.premiumExpiry).toLocaleDateString() : 'Free'}</td>
+                <td>${u.email}</td>
+                <td>${isPremium ? '✅ PREMIUM' : '👤 Free'}</td>
+                <td>${u.requestsToday}/${u.maxRequestsPerDay}</td>
+                <td>${isPremium ? new Date(u.premiumExpiry).toLocaleDateString() : 'N/A'}</td>
+                <td>
+                    <button class="remove-btn" onclick="suspendUser('${u._id}', ${u.maxRequestsPerDay > 1})">
+                        ${actionText}
+                    </button>
+                </td>
             </tr>`;
         });
         html += '</tbody></table>';
         document.getElementById(containerId).innerHTML = html;
     }
 
+    // 4. Suspend User Action (CONCEPTUAL - Needs Backend Endpoint)
+    window.suspendUser = async (userId, isPremium) => {
+        if (!confirm(`Are you sure you want to suspend user ${userId}? This will reset their limit to 1.`)) return;
+
+        // ⚠️ NEW BACKEND LOGIC REQUIRED HERE
+        updateStatus('user-status-msg', `Suspending user ${userId}...`, false);
+        
+        try {
+            const response = await fetch(ADMIN_SUSPEND_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ userId: userId }) // Backend will reset maxRequestsPerDay to 1
+            });
+            
+            if (response.ok) {
+                updateStatus('user-status-msg', `User ${userId} successfully suspended.`, true);
+                fetchUsers(); // Refresh the list
+            } else {
+                const data = await response.json();
+                updateStatus('user-status-msg', `Suspension Failed: ${data.message || 'Server error.'}`, false);
+            }
+        } catch(error) {
+            updateStatus('user-status-msg', 'Network error during suspension.', false);
+        }
+    };
+
+
+    // 5. System Logs (Display)
     function renderLogs(logs, containerId) {
         if (!logs || logs.length === 0) return document.getElementById(containerId).innerHTML = '<p>No system logs found.</p>';
         
-        let html = '<table><thead><tr><th>Time</th><th>User</th><th>Device ID</th><th>Status</th><th>Endpoint</th></tr></thead><tbody>';
+        let html = '<table><thead><tr><th>Time</th><th>User</th><th>Status</th><th>Endpoint</th><th>Details</th></tr></thead><tbody>';
         logs.forEach(l => {
             const statusClass = l.status === 'SUCCESS' ? 'status-success' : (l.status === 'RATE_LIMIT' ? 'status-limit' : 'status-error');
             html += `<tr>
                 <td>${new Date(l.timestamp).toLocaleTimeString()}</td>
                 <td>${l.username}</td>
-                <td>${l.deviceFingerprint.substring(0, 8)}...</td>
                 <td class="${statusClass}">${l.status}</td>
                 <td>${l.endpoint}</td>
+                <td>${l.details}</td>
             </tr>`;
         });
         html += '</tbody></table>';
@@ -306,16 +369,13 @@
     }
 
 
-    const fetchUsers = () => fetchData(ADMIN_USERS_API, 'user-status-msg', 'users-table-container', renderUsers);
     const fetchLogs = () => fetchData(ADMIN_LOGS_API, 'log-status-msg', 'logs-table-container', renderLogs);
 
 
     // --- Initialization Check ---
     document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
-
     // Initial check for existing token
     if (adminToken) {
-        // We need to fetch user info to get the username and role
         fetch(ADMIN_USER_INFO_API, { headers: { 'Authorization': `Bearer ${adminToken}` } })
             .then(res => res.json())
             .then(userData => {
