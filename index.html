@@ -8,9 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
     
     <style>
-        /* Base Styling */
+        /* CSS Styling (Maintained from previous versions) */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
             padding: 20px; 
             background-color: #f0f2f5; 
             color: #333;
@@ -32,56 +32,23 @@
         h1 { color: #d9534f; margin-bottom: 10px; }
         .description { color: #555; margin-bottom: 25px; font-size: 0.95em; }
         
-        /* 💡 NEW: Admin Header Styling */
-        #admin-link-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #ff4d4d; /* Red Background */
-            padding: 10px 0;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        #admin-link-bar a {
-            color: #000; /* Black Text */
+        /* Navigation Tabs */
+        #nav-tabs { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        #nav-tabs button {
+            background-color: #ccc;
+            color: #333;
+            width: 30%; 
+            margin: 0 1%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
             font-weight: bold;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            background-color: #f0f0f0;
             transition: background-color 0.2s;
         }
-        #admin-link-bar a:hover {
-            background-color: #fff;
-        }
+        .nav-active { background-color: #d9534f !important; color: white !important; }
 
-
-        /* 💡 NEW: Stylish Navigation Tabs */
-        #nav-tabs { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-        }
-        #nav-tabs button {
-            background: none;
-            border: none;
-            color: #555;
-            flex-grow: 1;
-            padding: 10px 5px;
-            margin: 0 5px;
-            font-weight: 600;
-            border-bottom: 3px solid transparent;
-            transition: color 0.2s, border-bottom 0.2s;
-        }
-        .nav-active {
-            color: #d9534f !important;
-            border-bottom: 3px solid #d9534f !important;
-        }
-
-        /* Inputs and Buttons (General Styles) */
+        /* Inputs and Buttons */
         input[type="text"], input[type="password"], select { 
             width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; 
             border: 2px solid #ccc; border-radius: 6px; 
@@ -94,35 +61,39 @@
         .secondary-btn { background-color: #5cb85c; }
         .secondary-btn:hover { background-color: #449d44; }
 
-        /* 💡 NEW: Stylish Response Box */
+        /* Status and Messages */
+        #user-status { margin-bottom: 15px; font-weight: bold; }
+        .user-status-text { color: #007bff; }
+        .user-premium-text { color: #ff4d4d; }
+        .message-box { padding: 10px; margin-top: 10px; border-radius: 6px; font-weight: bold; display: none;}
+        .success-msg { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-msg { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Premium Section Styles */
+        .package-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 6px; cursor: pointer; text-align: left; }
+        .package-card.selected { background-color: #f0f0f0; border-color: #d9534f; border-width: 2px; }
+        .payment-info-box { padding: 15px; border: 1px solid #bce8f1; background-color: #d9edf7; border-radius: 6px; text-align: left; color: #31708f; margin-top: 10px;}
+        .payment-details p { color: #555; font-size: 0.95em; line-height: 1.5;}
+
+        /* Text Art Output */
         #result { 
-            margin-top: 15px; 
-            padding: 15px; 
-            border: 2px solid #333; 
-            white-space: pre; 
-            background-color: #1a1a1a; /* Dark background */
-            color: #00ff40; /* Neon green text */
-            border-radius: 8px; 
-            font-size: 0.9em; 
-            overflow-x: auto;
-            font-family: 'Consolas', 'Courier New', Courier, monospace; 
-            line-height: 1.25; 
+            white-space: pre; background-color: #222; color: #00ff00; border: 1px solid #d9534f; 
+            padding: 15px; border-radius: 6px; font-size: 0.9em; overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace; line-height: 1.25; 
             text-align: left;
-            box-shadow: inset 0 0 5px rgba(0, 255, 64, 0.5); /* Subtle glow */
         }
-        .error-box { 
-            background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px;
-            word-wrap: break-word; white-space: normal;
-        }
-        .error-box .error-text { 
-            color: #721c24; font-weight: bold; font-family: Arial, sans-serif; display: block; 
-        }
+        .error-box { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px; word-wrap: break-word; white-space: normal; }
+        .error-box .error-text { color: #721c24; font-weight: bold; font-family: Arial, sans-serif; display: block; }
+        
+        /* Contact/Footer */
+        .contact-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: left; font-size: 0.9em; color: #555; line-height: 1.6; }
+        .contact-section a { color: #d9534f; text-decoration: none; }
     </style>
 </head>
 <body>
 
-<div id="admin-link-bar">
-    <a href="admin.html" target="_blank">ADMIN PANEL</a>
+<div id="admin-link-bar" style="position: fixed; top: 0; left: 0; width: 100%; background-color: #ff4d4d; padding: 10px 0; z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center;">
+    <a href="admin.html" target="_blank" style="color: #000; font-weight: bold; text-decoration: none; padding: 8px 15px; border-radius: 4px; background-color: #f0f0f0; transition: background-color 0.2s;">ADMIN PANEL</a>
 </div>
 
 <div class="container" style="margin-top: 50px;">
@@ -194,7 +165,7 @@
                 <option value="sg">Singapore (sg)</option>
                 <option value="in">India (in)</option>
                 <option value="id">Indonesia (id)</option>
-            </select>
+                </select>
 
             <label for="uid">Enter Game ID (UID):</label>
             <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
@@ -216,11 +187,42 @@
 
         <div id="payment-view" style="display: none;">
             <h2>Payment Instructions</h2>
+            
+            <div class="payment-info-box">
+                <p><strong>Selected Plan:</strong> <span id="selected-plan">N/A</span></p>
+                <p><strong>Price:</strong> <span id="selected-price">N/A</span></p>
+            </div>
+            
+            <div class="payment-details">
+                <h3 style="color:#d9534f; margin-top:15px;">Local Payment Methods (LKR)</h3>
+                <p><strong>1. Ez Cash:</strong> 0762332957</p>
+                
+                <h4 style="margin-top:10px;">2. Bank Transfer (Commercial Bank)</h4>
+                <p><strong>Account Name:</strong> WOS JAYALATH</p>
+                <p><strong>Account Number:</strong> 8012396005</p>
+                <p><strong>Branch:</strong> Head Office Branch</p>
+                <p style="margin-top:10px;"><strong>3. Dialog Finance Plc:</strong> 001020027802</p>
+
+                <h3 style="color:#d9534f; margin-top:15px;">International Users (Crypto)</h3>
+                <div class="crypto-note">
+                    <p>Note: 305 LKR ≈ 1 USDT</p>
+                    <p><strong>Bybit ID:</strong> 133761830</p>
+                    <p><strong>Binance ID:</strong> 473713483</p>
+                </div>
+                
+                <p style="color: #d9534f; font-weight: bold; margin-top: 20px;">
+                    ⚠️ ACTION REQUIRED: After payment, contact the Admin with proof to receive your unique Premium Code.
+                </p>
+                <p style="font-size: 0.8em; color: #777;">
+                    * Half Payment is fully refundable.
+                </p>
+            </div>
             <button onclick="showSection('package-selection')" class="secondary-btn">← Back to Packages</button>
         </div>
 
         <div id="redemption-section" style="margin-top: 30px;">
             <h2>Activate Your Plan</h2>
+            <p style="color: #555; font-size: 0.95em; margin-bottom: 10px;">Enter the Premium Code received from the Admin after payment.</p>
             <input type="text" id="premium-code-input" placeholder="Enter your Premium Code">
             <button id="redeem-btn" onclick="redeemCode()" class="action-button secondary-btn">Activate Plan</button>
             <p id="redemption-status" style="margin-top: 10px;"></p>
@@ -230,7 +232,10 @@
 
     <div class="contact-section">
         <h2 style="text-align: center;">Contact Us</h2>
-        </div>
+        <strong>Email:</strong> <a href="mailto:wosandaruwanjayalath@gmail.com">wosandaruwanjayalath@gmail.com</a><br>
+        <strong>Facebook:</strong> <a href="https://www.facebook.com/sandaruwan.verified" target="_blank">Sandaruwan Jayalath</a><br>
+        <strong>Mobile:</strong> 0762332957 <small>(Please call 6.00 pm to 9.00 pm on weekdays)</small>
+    </div>
 </div>
 
 <script>
@@ -243,7 +248,7 @@
     const REDEEM_API = `${BASE_URL}/api/redeem`;
     const USER_INFO_API = `${BASE_URL}/api/user-info`; 
 
-    // Defined packages (Full List - for rendering)
+    // Defined packages (Full List - Used for rendering)
     const PACKAGES = [
         { id: 101, requests: 2, price: 50, duration: '7 days', type: 'WEEKLY' }, { id: 102, requests: 5, price: 125, duration: '7 days', type: 'WEEKLY' },
         { id: 103, requests: 10, price: 250, duration: '7 days', type: 'WEEKLY' }, { id: 104, requests: 20, price: 500, duration: '7 days', type: 'WEEKLY' },
@@ -285,14 +290,12 @@
     
     // FIX: Corrected Navigation Logic
     function showSection(sectionId) {
-        // Hide all major sections
         document.getElementById('auth-section').style.display = 'none';
         document.getElementById('tool-section').style.display = 'none';
         document.getElementById('premium-section').style.display = 'none';
         document.getElementById('payment-view').style.display = 'none';
         document.getElementById('package-list').style.display = 'none';
 
-        // Reset nav bar highlighting
         document.getElementById('tab-auth').classList.remove('nav-active');
         document.getElementById('tab-tool').classList.remove('nav-active');
         document.getElementById('tab-premium').classList.remove('nav-active');
@@ -336,7 +339,6 @@
 
 
     async function updateNavAndStatus(user) {
-        // ... (Status update logic remains the same) ...
         const token = getAuthToken();
         const authStatus = document.getElementById('auth-status');
         const planStatus = document.getElementById('plan-status');
@@ -407,7 +409,7 @@
                 showMessage(msgId, data.message + ' Redirecting...', true);
                 
                 await fetchUserInfo(); 
-                showSection('tool'); 
+                showSection('tool'); // Redirect to tool after login
             } else {
                 // This handles the "Invalid email or password" error
                 showMessage(msgId, data.message || data.error || 'Authentication failed. Check email and password.', false);
@@ -419,6 +421,7 @@
 
 
     function logoutUser() {
+        // ... (Logout logic remains the same) ...
         localStorage.removeItem('jwtToken');
         updateNavAndStatus(null);
         showSection('auth'); 
@@ -487,11 +490,128 @@
             showMessage(msgId, 'Network error. Could not connect to the server.', false);
         }
     });
-
-
-    // --- Other Logic (renderPackages, selectPackage, redeemCode, handleErrorResponse, formatResponseToTextArt) are omitted for brevity but remain the same ---
     
-    // FINAL API TOOL SUBMIT LOGIC (Remains the same)
+    // --- OTHER UI LOGIC (Packages, Redeem, API Call) ---
+
+    function renderPackages() { /* ... (Logic remains the same) ... */
+        const listContainer = document.getElementById('package-cards-container');
+        listContainer.innerHTML = '';
+        
+        const weekly = PACKAGES.filter(p => p.type === 'WEEKLY');
+        const monthly = PACKAGES.filter(p => p.type === 'MONTHLY');
+
+        const createSection = (title, pkgs) => {
+             const titleElement = document.createElement('h4');
+             titleElement.textContent = title;
+             titleElement.style.marginTop = '15px';
+             listContainer.appendChild(titleElement);
+             
+             pkgs.forEach((pkg) => {
+                const card = document.createElement('div');
+                card.className = 'package-card';
+                card.innerHTML = `
+                    <p style="font-size: 1.1em; color: #333;"><strong>${pkg.requests} Requests / Day</strong></p>
+                    <p style="color: #d9534f; margin-top: 5px;">Price: <strong>${pkg.price} LKR</strong> / ${pkg.duration}</p>
+                `;
+                card.onclick = () => selectPackage(pkg.id);
+                listContainer.appendChild(card);
+             });
+        };
+        
+        createSection('Weekly Plans', weekly);
+        createSection('Monthly Plans', monthly);
+    }
+
+    function selectPackage(pkgId) {
+        document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
+        selectedPackage = PACKAGES.find(pkg => pkg.id === pkgId);
+        
+        if (selectedPackage) {
+            const allCards = document.querySelectorAll('.package-card');
+            for(let card of allCards) {
+                if (card.innerHTML.includes('Requests / Day') && card.innerHTML.includes(selectedPackage.price + ' LKR')) {
+                    card.classList.add('selected');
+                    break;
+                }
+            }
+            
+            document.getElementById('selected-plan').textContent = `${selectedPackage.requests} Requests / Day (${selectedPackage.duration})`;
+            document.getElementById('selected-price').textContent = `${selectedPackage.price} LKR`;
+            showSection('payment-view');
+        }
+    }
+    
+    async function redeemCode() {
+        const code = document.getElementById('premium-code-input').value.trim();
+        const statusElement = document.getElementById('redemption-status');
+        const token = getAuthToken();
+
+        if (!token) { statusElement.innerHTML = '<span class="error-msg">You must be logged in to redeem a code.</span>'; return; }
+        if (!code) { statusElement.innerHTML = '<span class="error-msg">Please enter the code provided by the Admin.</span>'; return; }
+
+        statusElement.innerHTML = '<span class="success-msg" style="color:#007bff; background:white;">Processing activation...</span>';
+
+        try {
+             const response = await fetch(REDEEM_API, {
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                 body: JSON.stringify({ code: code })
+             });
+             
+             const result = await response.json();
+             
+             if (response.ok && result.success) {
+                 statusElement.innerHTML = `<span class="success-msg">✅ Success! Plan active for ${result.duration}. Limit: ${result.requests} commands/day.</span>`;
+                 await fetchUserInfo(); 
+             } else {
+                 statusElement.innerHTML = `<span class="error-msg">❌ Activation Failed: ${result.message || 'Invalid or expired code.'}</span>`;
+             }
+
+        } catch (error) {
+             statusElement.innerHTML = '<span class="error-msg">NETWORK ERROR: Could not connect to the activation server.</span>';
+        }
+    }
+
+
+    function handleErrorResponse(errorMessage, statusCode) { /* ... (Logic remains the same) ... */
+        if (statusCode === 429) { return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM SLT.`; }
+        const errorText = String(errorMessage).toLowerCase();
+
+        if (errorText.includes("fraud attempt detected")) {
+             return "FRAUD ATTEMPT DETECTED: It appears you are attempting to cheat. This account or device has already claimed the daily limit. Our policy against cheating is zero tolerance. If this is an honest mistake, please contact us via email to resolve the issue. Fraudulent requests will be rejected.";
+        }
+        if (errorText.includes("invalid uid")) { return "ERROR: Invalid Player ID (UID). Please check the number and try again."; } 
+        
+        return `UNKNOWN ERROR: An unexpected issue occurred. Message: "${errorMessage}"`;
+    }
+
+    function formatResponseToTextArt(data) {
+        const res = data.response;
+        const nickname = res.PlayerNickname || 'N/A';
+        const uid = res.UID || 'N/A';
+        const level = res.PlayerLevel || 'N/A';
+        const likesBefore = res.LikesbeforeCommand || 0;
+        const likesAfter = res.LikesafterCommand || 0;
+        const likesGiven = res.LikesGivenByAPI || 0;
+        
+        return `╔════════════════════════════════════════════╗
+║             ⚡ FREE FIRE LIKES ⚡             ║
+╠════════════════════════════════════════════╣
+║ COMMAND STATUS: [SUCCESS]                    ║
+║                                            ║
+║ ✦ Player Name:  ${nickname}
+║ ✦ Player ID:    ${uid}
+║ ✦ Level:        ${level}
+				║                                            ║
+║ ❖ Likes Before:  👍🏻 ${likesBefore}
+║ ❖ Likes After:   👍🏻 ${likesAfter}
+║ ❖ Likes Gained:  🔥 ${likesGiven}
+				║                                            ║
+╠════════════════════════════════════════════╣
+║ > Not For Resale. Copyright Sandaruwan Jayalath ©️
+╚════════════════════════════════════════════╝`;
+    }
+
     document.getElementById('dataForm').addEventListener('submit', async function(event) {
         event.preventDefault(); 
         
@@ -522,11 +642,7 @@
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}` 
                 }, 
-                body: JSON.stringify({ 
-                    region: region, 
-                    uid: uid, 
-                    deviceId: deviceId 
-                })
+                body: JSON.stringify({ region: region, uid: uid, deviceId: deviceId })
             });
 
             const data = await response.json();
