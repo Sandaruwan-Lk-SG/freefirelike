@@ -3,720 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Like System - Premium Access</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
-    
+    <title>ADMIN DASHBOARD - FF LIKES SYSTEM</title>
     <style>
-        /* General Reset and Base Styling */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            padding: 20px; 
-            background-color: #f0f2f5; 
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .container { 
-            max-width: 480px; 
-            width: 90%;
-            padding: 30px; 
-            background: #ffffff; 
-            border-radius: 12px; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
-            text-align: center;
-        }
-        h1 { color: #d9534f; margin-bottom: 10px; }
-        .description { color: #555; margin-bottom: 25px; font-size: 0.95em; }
+        /* Base and Layout */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 0; background-color: #f4f7f6; color: #333; }
+        .main-wrapper { display: flex; max-width: 1200px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); min-height: 80vh; }
+        h1 { color: #d9534f; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
         
-        /* 💡 NEW: Admin Link Header */
-        #admin-link-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Side Navigation (Sidebar) */
+        .sidebar { 
+            width: 220px; 
+            background-color: #2c3e50; /* Dark Blue/Gray */
+            color: white; 
+            padding: 20px 0;
+            border-radius: 12px 0 0 12px;
+        }
+        .sidebar button {
             width: 100%;
-            background-color: #ff4d4d; 
-            padding: 10px 0;
-            z-index: 1000;
-            text-align: center;
-        }
-        #admin-link-bar a {
-            color: #000; 
-            font-weight: bold;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            background-color: #f0f0f0;
-            transition: background-color 0.2s;
-        }
-
-        /* 💡 Navigation Tabs FIX */
-        #nav-tabs { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-        }
-        #nav-tabs button {
-            background: none;
-            border: none;
-            color: #555;
-            flex-grow: 1; /* Allow buttons to grow equally */
-            padding: 12px 2px; /* Increased vertical padding, reduced horizontal */
-            margin: 0 1px;
-            font-weight: 600;
-            font-size: 0.9em; /* Reduced font size for better fit on mobile */
-            white-space: nowrap; /* Prevent line breaks within the tab */
-            border-bottom: 3px solid transparent;
-            transition: color 0.2s, border-bottom 0.2s;
-        }
-        .nav-active {
-            color: #d9534f !important;
-            border-bottom: 3px solid #d9534f !important;
-        }
-
-        /* Inputs and Buttons */
-        input[type="text"], input[type="password"], select { 
-            width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; 
-            border: 2px solid #ccc; border-radius: 6px; 
-        }
-        button { 
-            width: 100%; padding: 14px; background-color: #d9534f; color: white; 
-            font-size: 16px; font-weight: bold; border: none; border-radius: 6px; 
-            cursor: pointer; transition: background-color 0.3s; margin-top: 5px;
-        }
-        .secondary-btn { background-color: #5cb85c; }
-        .secondary-btn:hover { background-color: #449d44; }
-
-        /* 💡 NEW: Stylish Response Box */
-        #result { 
-            margin-top: 15px; 
-            padding: 15px; 
-            border: 2px solid #333; 
-            white-space: pre; 
-            background-color: #1a1a1a; 
-            color: #00ff40; 
-            border-radius: 8px; 
-            font-size: 0.9em; 
-            overflow-x: auto;
-            font-family: 'Consolas', 'Courier New', Courier, monospace; 
-            line-height: 1.25; 
             text-align: left;
-            box-shadow: inset 0 0 5px rgba(0, 255, 64, 0.5);
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            color: #ecf0f1;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 600;
         }
-        .error-box { 
-            background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px;
-            word-wrap: break-word; white-space: normal;
+        .sidebar button:hover, .sidebar button.nav-active {
+            background-color: #34495e; /* Slightly lighter on hover */
+            border-left: 5px solid #d9534f; /* Red active indicator */
+            padding-left: 15px;
         }
-        .error-box .error-text { color: #721c24; font-weight: bold; font-family: Arial, sans-serif; display: block; }
+        .logout-btn { 
+            background-color: #e74c3c !important; 
+            margin-top: 30px; 
+        }
+
+        /* Content Area */
+        .content-area { flex-grow: 1; padding: 30px; }
+        
+        /* Data Tables */
+        .data-section { max-height: 500px; overflow-y: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85em; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; word-break: break-word; }
+        th { background-color: #f2f2f2; }
+        .status-fraud { background-color: #ffcccc; color: red; }
+        
+        /* Forms */
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        input[type="text"], input[type="password"], input[type="number"], select { padding: 8px; border: 1px solid #ccc; width: 100%; box-sizing: border-box; }
+        .action-button { background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        .remove-btn { background-color: #e74c3c; width: auto; padding: 6px 12px; font-size: 0.8em; }
+
+        /* Status Messages */
+        .status-msg { padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold; display: none; }
+        .status-success { background-color: #dff0d8; color: #3c763d; }
+        .status-error { background-color: #f2dede; color: #a94442; }
     </style>
 </head>
 <body>
 
-<div id="admin-link-bar">
-    <a href="admin.html" target="_blank">ADMIN PANEL</a>
-</div>
-
-<div class="container" style="margin-top: 50px;">
-    <h1>Free Fire Like System</h1>
-    <p class="description">Secure Premium Access for Enhanced Features.</p>
-    
-    <div id="user-status">
-        Status: <span id="auth-status" class="user-status-text">Logged Out</span>
-        | Plan: <span id="plan-status" class="user-premium-text">Free (1/day)</span>
-    </div>
-
-    <div id="nav-tabs">
-        <button id="tab-auth" onclick="showSection('auth')">Login/Register</button>
-        <button id="tab-tool" onclick="showSection('tool')" class="nav-active">Get Likes</button> <button id="tab-premium" onclick="showSection('premium')">Get Premium</button>
-    </div>
-
-    <div id="auth-section" style="display: none;">
-        <h2>User Authentication</h2>
-        <div id="auth-message" class="message-box"></div>
-
-        <div id="login-form">
-            <h3>Login</h3>
-            <form id="loginForm">
-                <label for="login-email">Email Address:</label>
-                <input type="text" id="login-email" required> 
-                <label for="login-password">Password:</label>
-                <input type="password" id="login-password" required>
-                <button type="submit">Login</button>
-            </form>
-            <p style="margin-top: 15px;">No account? <a href="#" onclick="toggleAuthView('register')">Register here</a></p>
-        </div>
-
-        <div id="register-form" style="display:none;">
-            <h3>Register (Step 1: Request Code)</h3>
-            <form id="requestCodeForm">
-                <label for="reg-username">Username:</label>
-                <input type="text" id="reg-username" required>
-                <label for="reg-email">Email:</label>
-                <input type="text" id="reg-email" placeholder="Verification code will be sent here" required>
-                <label for="reg-password">Password:</label>
-                <input type="password" id="reg-password" required>
-                <button type="submit" class="secondary-btn">Request Verification Code</button>
-            </form>
-            <p style="margin-top: 15px;">Already have an account? <a href="#" onclick="toggleAuthView('login')">Login here</a></p>
-            <p style="margin-top: 10px;">Already have a code? <a href="#" onclick="toggleAuthView('verify')">Verify here</a></p>
-        </div>
-        
-        <div id="verify-form" style="display:none;">
-            <h3>Register (Step 2: Verify Code)</h3>
-            <form id="verifyCodeForm">
-                <label for="verify-username">Username:</label>
-                <input type="text" id="verify-username" placeholder="Enter your requested username" required>
-                <label for="verify-code">Verification Code:</label>
-                <input type="text" id="verify-code" placeholder="Enter the 6-digit code from email" required>
-                <button type="submit" class="secondary-btn">Verify and Register</button>
-            </form>
-            <p style="margin-top: 15px;">Need a new code? <a href="#" onclick="toggleAuthView('register')">Request new code</a></p>
-        </div>
-        
-        <button id="logout-btn" onclick="logoutUser()" style="display:none; background-color: #ff4d4d; margin-top: 20px;">Logout</button>
-    </div>
-
-    <div id="tool-section">
-        <form id="dataForm">
-            <label for="region">Select Region:</label>
-            <select id="region" name="region" required>
-                <option value="">-- Select a Region --</option>
-                <option value="sg">Singapore (sg)</option>
-                <option value="in">India (in)</option>
-                <option value="id">Indonesia (id)</option>
-            </select>
-
-            <label for="uid">Enter Game ID (UID):</label>
-            <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
-
-            <button type="submit" id="submitBtn" class="action-button">Execute Likes Command</button>
+<div id="app-wrapper">
+    <div id="admin-login-section" class="content-section" style="width: 400px; margin: 50px auto;">
+        <h1>Admin Login</h1>
+        <form id="adminLoginForm">
+            <label for="admin-email">Email:</label>
+            <input type="text" id="admin-email" required placeholder="Enter Admin Email">
+            <label for="admin-password">Password:</label>
+            <input type="password" id="admin-password" required placeholder="Enter Admin Password">
+            <button type="submit" style="background-color: #d9534f;">Login</button>
+            <p id="admin-login-status" class="status-msg" style="display:none;"></p>
         </form>
-
-        <h2>Your Request Status</h2>
-        <div id="result">Please Login to use the service.</div>
     </div>
-    
-    <div id="premium-section" style="display: none;">
+
+    <div id="dashboard-layout" class="main-wrapper" style="display: none;">
         
-        <div id="package-list">
-            <h2>Select a Premium Plan</h2>
-            <div id="package-cards-container">
-                </div>
+        <div class="sidebar">
+            <h3 style="padding: 0 20px; color: #ff4d4d;">Control Panel</h3>
+            <button id="nav-codes" onclick="showAdminSection('codes')" class="nav-active">➕ Code Generator</button>
+            <button id="nav-users" onclick="showAdminSection('users')">👥 Manage Users</button>
+            <button id="nav-logs" onclick="showAdminSection('logs')">📊 System Logs</button>
+            <button id="nav-stats" onclick="showAdminSection('stats')">📈 Data Review</button>
+            <button class="logout-btn" onclick="adminLogout()">🔒 Log Out</button>
         </div>
+        
+        <div class="content-area">
+            <h1 id="welcome-header">Welcome, Admin</h1>
 
-        <div id="payment-view" style="display: none;">
-            <h2>Payment Instructions</h2>
-            
-            <div class="payment-info-box">
-                <p><strong>Selected Plan:</strong> <span id="selected-plan">N/A</span></p>
-                <p><strong>Price:</strong> <span id="selected-price">N/A</span></p>
+            <div id="codes-section" class="content-section">
+                <h3>Code Generation & Management</h3>
+                <form id="generatorForm">
+                    <div class="input-group">
+                        <label style="width: 30%;">Requests/Day: <input type="number" id="requests" min="1" max="100" required value="50"></label>
+                        <label style="width: 30%;">Duration (Days): <select id="days" required><option value="7">7 Days</option><option value="30">30 Days</option><option value="365">365 Days</option></select></label>
+                        <label style="width: 40%;">Admin Key (Auto-Filled): <input type="password" id="dummyKey" disabled value="Encrypted"></label>
+                    </div>
+                    <button type="submit" style="background-color: #d9534f;">Generate and Save Code</button>
+                </form>
+                <p id="code-status" class="status-msg"></p>
+                <div id="code-output-box" class="generated-code-box" style="display:none;">
+                    <p>Generated Code:</p>
+                    <code id="generatedCode" onclick="copyCode(this)">CODE HERE</code>
+                    <p style="font-size: 0.8em; color: #333;">Click to Copy | Limit: <span id="limitValue"></span> reqs / Days: <span id="daysValue"></span></p>
+                </div>
             </div>
             
-            <div class="payment-details">
-                <h3 style="color:#d9534f; margin-top:15px;">Local Payment Methods (LKR)</h3>
-                <p><strong>1. Ez Cash:</strong> 0762332957</p>
-                
-                <h4 style="margin-top:10px;">2. Bank Transfer (Commercial Bank)</h4>
-                <p><strong>Account Name:</strong> WOS JAYALATH</p>
-                <p><strong>Account Number:</strong> 8012396005</p>
-                <p><strong>Branch:</strong> Head Office Branch</p>
-                <p style="margin-top:10px;"><strong>3. Dialog Finance Plc:</strong> 001020027802</p>
-
-                <h3 style="color:#d9534f; margin-top:15px;">International Users (Crypto)</h3>
-                <div class="crypto-note">
-                    <p>Note: 305 LKR ≈ 1 USDT</p>
-                    <p><strong>Bybit ID:</strong> 133761830</p>
-                    <p><strong>Binance ID:</strong> 473713483</p>
+            <div id="users-section" class="content-section" style="display: none;">
+                <h3>User Management</h3>
+                <div class="input-group">
+                    <input type="text" id="userSearch" placeholder="Search by Username, Email or ID...">
+                    <button onclick="fetchUsers()">Search/Refresh</button>
                 </div>
-                
-                <p style="color: #d9534f; font-weight: bold; margin-top: 20px;">
-                    ⚠️ ACTION REQUIRED: After payment, contact the Admin with proof to receive your unique Premium Code.
-                </p>
-                <p style="font-size: 0.8em; color: #777;">
-                    * Half Payment is fully refundable.
-                </p>
+                <p id="user-status-msg" class="status-msg">Loading user data...</p>
+                <div id="users-table-container" class="data-section"></div>
             </div>
-            <button onclick="showSection('package-selection')" class="secondary-btn">← Back to Packages</button>
+            
+            <div id="logs-section" class="content-section" style="display: none;">
+                <h3>System Logs (Last 100 Requests)</h3>
+                <p id="log-status-msg" class="status-msg">Loading log data...</p>
+                <div id="logs-table-container" class="data-section"></div>
+            </div>
+
+            <div id="stats-section" class="content-section" style="display: none;">
+                <h3>Daily/Monthly Data Review</h3>
+                <p>This section will show charts and aggregate statistics (Requires advanced backend logic and aggregation).</p>
+                <ul>
+                    <li>Total Users: <span id="totalUsers">0</span></li>
+                    <li>Active Premium: <span id="activePremium">0</span></li>
+                    <li>Today's Fraud Attempts: <span id="todayFraud">0</span></li>
+                </ul>
+            </div>
+
         </div>
-
-        <div id="redemption-section" style="margin-top: 30px;">
-            <h2>Activate Your Plan</h2>
-            <p style="color: #555; font-size: 0.95em; margin-bottom: 10px;">Enter the Premium Code received from the Admin after payment.</p>
-            <input type="text" id="premium-code-input" placeholder="Enter your Premium Code">
-            <button id="redeem-btn" onclick="redeemCode()" class="action-button secondary-btn">Activate Plan</button>
-            <p id="redemption-status" style="margin-top: 10px;"></p>
-        </div>
-
-    </div>
-
-    <div class="contact-section">
-        <h2 style="text-align: center;">Contact Us</h2>
-        <strong>Email:</strong> <a href="mailto:wosandaruwanjayalath@gmail.com">wosandaruwanjayalath@gmail.com</a><br>
-        <strong>Facebook:</strong> <a href="https://www.facebook.com/sandaruwan.verified" target="_blank">Sandaruwan Jayalath</a><br>
-        <strong>Mobile:</strong> 0762332957 <small>(Please call 6.00 pm to 9.00 pm on weekdays)</small>
     </div>
 </div>
 
 <script>
-    // --- Configuration (UPDATE THIS BASE URL!) ---
+    // --- Configuration (MUST MATCH server.js) ---
     const BASE_URL = 'https://freefirewebbackend-production.up.railway.app';
-    const LOGIN_API = `${BASE_URL}/api/login`;
-    const REQUEST_CODE_API = `${BASE_URL}/api/request-code`; 
-    const VERIFY_REGISTER_API = `${BASE_URL}/api/verify-and-register`; 
-    const LIKES_API = `${BASE_URL}/api/get-likes`;
-    const REDEEM_API = `${BASE_URL}/api/redeem`;
-    const USER_INFO_API = `${BASE_URL}/api/user-info`; 
+    const ADMIN_LOGIN_API = `${BASE_URL}/api/login`; 
+    const ADMIN_GENERATE_API = `${BASE_URL}/api/admin/generate-code`;
+    const ADMIN_USERS_API = `${BASE_URL}/api/admin/users`;
+    const ADMIN_LOGS_API = `${BASE_URL}/api/admin/logs`;
+    const ADMIN_USER_INFO_API = `${BASE_URL}/api/user-info`;
+    const ADMIN_SUSPEND_API = `${BASE_URL}/api/admin/suspend-user`; // 💡 NEW: Conceptual Endpoint
+    const ADMIN_REMOVE_CODE_API = `${BASE_URL}/api/admin/remove-code`; // 💡 NEW: Conceptual Endpoint
 
-    // Defined packages (Full List - Used for rendering)
-    const PACKAGES = [
-        { id: 101, requests: 2, price: 50, duration: '7 days', type: 'WEEKLY' }, { id: 102, requests: 5, price: 125, duration: '7 days', type: 'WEEKLY' },
-        { id: 103, requests: 10, price: 250, duration: '7 days', type: 'WEEKLY' }, { id: 104, requests: 20, price: 500, duration: '7 days', type: 'WEEKLY' },
-        { id: 105, requests: 30, price: 750, duration: '7 days', type: 'WEEKLY' }, { id: 106, requests: 40, price: 1000, duration: '7 days', type: 'WEEKLY' },
-        { id: 107, requests: 50, price: 1250, duration: '7 days', type: 'WEEKLY' }, { id: 108, requests: 60, price: 1500, duration: '7 days', type: 'WEEKLY' },
-        { id: 109, requests: 70, price: 1750, duration: '7 days', type: 'WEEKLY' }, { id: 110, requests: 80, price: 2000, duration: '7 days', type: 'WEEKLY' },
-        { id: 111, requests: 90, price: 2250, duration: '7 days', type: 'WEEKLY' }, { id: 112, requests: 100, price: 2500, duration: '7 days', type: 'WEEKLY' },
-        { id: 201, requests: 2, price: 170, duration: '30 days', type: 'MONTHLY' }, { id: 202, requests: 5, price: 425, duration: '30 days', type: 'MONTHLY' },
-        { id: 203, requests: 10, price: 850, duration: '30 days', type: 'MONTHLY' }, { id: 204, requests: 20, price: 1700, duration: '30 days', type: 'MONTHLY' },
-        { id: 205, requests: 30, price: 2550, duration: '30 days', type: 'MONTHLY' }, { id: 206, requests: 40, price: 3400, duration: '30 days', type: 'MONTHLY' },
-        { id: 207, requests: 50, price: 4250, duration: '30 days', type: 'MONTHLY' }, { id: 208, requests: 60, price: 5100, duration: '30 days', type: 'MONTHLY' },
-        { id: 209, requests: 70, price: 5950, duration: '30 days', type: 'MONTHLY' }, { id: 210, requests: 80, price: 6800, duration: '30 days', type: 'MONTHLY' },
-        { id: 211, requests: 90, price: 7650, duration: '30 days', type: 'MONTHLY' }, { id: 212, requests: 100, price: 8500, duration: '30 days', type: 'MONTHLY' },
-    ];
+    let adminToken = localStorage.getItem('adminToken');
+    let adminData = null;
 
-    let selectedPackage = null;
+    // --- Utility Functions ---
     
-    // --- UTILITIES AND UI MANAGEMENT ---
-
-    function getAuthToken() { return localStorage.getItem('jwtToken'); }
-
-    function showMessage(elementId, message, isSuccess = false) {
+    function updateStatus(elementId, message, isSuccess = false) {
         const el = document.getElementById(elementId);
         el.textContent = message;
-        el.className = `message-box ${isSuccess ? 'success-msg' : 'error-msg'}`;
+        el.className = isSuccess ? 'status-msg status-success' : 'status-msg status-error';
         el.style.display = 'block';
     }
-    
-    async function getDeviceID() {
-        try {
-            if (typeof FingerprintJS === 'undefined') return 'error-fpjs-missing';
-            const fp = await FingerprintJS.load();
-            const result = await fp.get();
-            return result.visitorId;
-        } catch (e) {
-            return 'error-device';
-        }
+
+    function setAuthStatus(isLoggedIn, username = '') {
+        const loginSection = document.getElementById('admin-login-section');
+        const dashboard = document.getElementById('dashboard-layout');
+        
+        document.getElementById('welcome-header').textContent = isLoggedIn ? `Welcome, ${username} (Root Admin)` : 'Admin Dashboard - Please Login';
+        loginSection.style.display = isLoggedIn ? 'none' : 'block';
+        dashboard.style.display = isLoggedIn ? 'flex' : 'none';
+        
+        if (isLoggedIn) showAdminSection('codes');
     }
     
-    // Renders the correct section based on tab click (FIXED NAVIGATION)
-    function showSection(sectionId) {
-        // Hide all major sections
-        document.getElementById('auth-section').style.display = 'none';
-        document.getElementById('tool-section').style.display = 'none';
-        document.getElementById('premium-section').style.display = 'none';
-        document.getElementById('payment-view').style.display = 'none';
-        document.getElementById('package-list').style.display = 'none';
+    function showAdminSection(sectionId) {
+        document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.sidebar button').forEach(el => el.classList.remove('nav-active'));
 
-        // Reset nav bar highlighting
-        document.getElementById('tab-auth').classList.remove('nav-active');
-        document.getElementById('tab-tool').classList.remove('nav-active');
-        document.getElementById('tab-premium').classList.remove('nav-active');
+        document.getElementById(sectionId + '-section').style.display = 'block';
+        document.getElementById('nav-' + sectionId).classList.add('nav-active');
 
-        if (sectionId === 'auth') {
-            document.getElementById('auth-section').style.display = 'block';
-            document.getElementById('tab-auth').classList.add('nav-active');
-            toggleAuthView('login');
-        } 
-        else if (sectionId === 'tool') {
-            document.getElementById('tool-section').style.display = 'block';
-            document.getElementById('tab-tool').classList.add('nav-active');
-        } 
-        else if (sectionId === 'premium' || sectionId === 'package-selection' || sectionId === 'payment-view') {
-            document.getElementById('premium-section').style.display = 'block';
-            document.getElementById('tab-premium').classList.add('nav-active');
-            
-            if (sectionId === 'package-selection' || sectionId === 'premium') {
-                document.getElementById('package-list').style.display = 'block';
-            } else if (sectionId === 'payment-view') {
-                document.getElementById('payment-view').style.display = 'block';
-            }
-        }
+        // Load data specific to the section
+        if (sectionId === 'users') fetchUsers();
+        if (sectionId === 'logs') fetchLogs();
     }
     
-    // Toggles between Login and Register/Verify forms
-    function toggleAuthView(view) {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'none'; 
-        document.getElementById('verify-form').style.display = 'none'; 
-        document.getElementById('auth-message').style.display = 'none';
-
-        if (view === 'login') {
-            document.getElementById('login-form').style.display = 'block';
-        } else if (view === 'register') {
-            document.getElementById('register-form').style.display = 'block';
-        } else if (view === 'verify') {
-            document.getElementById('verify-form').style.display = 'block';
-        }
+    function copyCode(element) {
+        const code = element.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            alert(`Code copied: ${code}`);
+        }).catch(err => {
+            console.error('Copy failed: ', err);
+        });
     }
 
+    // --- Feature Logic (Needs Backend) ---
 
-    async function updateNavAndStatus(user) {
-        const token = getAuthToken();
-        const authStatus = document.getElementById('auth-status');
-        const planStatus = document.getElementById('plan-status');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        if (token && user) {
-            authStatus.textContent = `Logged in as ${user.username}`;
-            authStatus.classList.remove('user-status-text');
-            authStatus.classList.add('user-premium-text');
-            
-            const isPremium = user.isPremium && new Date(user.premiumExpiry) > new Date();
-            const planText = isPremium ? `PREMIUM (${user.maxRequestsPerDay}/day)` : `FREE (${user.maxRequestsPerDay}/day)`;
-            
-            planStatus.textContent = planText;
-            logoutBtn.style.display = 'block';
-        } else {
-            authStatus.textContent = 'Logged Out';
-            authStatus.className = 'user-status-text';
-            planStatus.textContent = 'Free (1/day)';
-            logoutBtn.style.display = 'none';
-        }
-    }
-
-    async function fetchUserInfo() {
-        const token = getAuthToken();
-        if (!token) { updateNavAndStatus(null); return; }
+    // 1. Authenticate Admin (Reusing main login endpoint)
+    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('admin-email').value;
+        const password = document.getElementById('admin-password').value;
+        const statusEl = document.getElementById('admin-login-status');
+        
+        statusEl.textContent = 'Logging in...';
+        const deviceId = 'ADMIN_DEVICE_FINGERPRINT_SKIP'; 
 
         try {
-            const response = await fetch(USER_INFO_API, { headers: { 'Authorization': `Bearer ${token}` } });
+            const response = await fetch(ADMIN_LOGIN_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, deviceId }) 
+            });
+
             const data = await response.json();
+
+            if (response.ok && data.token) {
+                // Verify Admin Role using the issued token
+                const userResponse = await fetch(ADMIN_USER_INFO_API, { headers: { 'Authorization': `Bearer ${data.token}` } });
+                const userData = await userResponse.json();
+
+                if (userResponse.ok && userData.role === 'admin') {
+                    localStorage.setItem('adminToken', data.token);
+                    adminToken = data.token;
+                    adminData = userData;
+                    setAuthStatus(true, userData.username);
+                } else {
+                    statusEl.textContent = 'Login failed: Insufficient permissions (Not Admin).';
+                    localStorage.removeItem('adminToken');
+                }
+            } else {
+                statusEl.textContent = data.message || 'Login failed: Invalid credentials.';
+            }
+        } catch (error) {
+            statusEl.textContent = 'Network error during login.';
+        }
+    });
+
+    // 2. Generate Code
+    document.getElementById('generatorForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const requestsPerDay = parseInt(document.getElementById('requests').value);
+        const validDays = parseInt(document.getElementById('days').value);
+        const statusEl = document.getElementById('code-status');
+        
+        if (!adminToken) return updateStatus('code-status', 'Error: Authentication required.', false);
+
+        statusEl.textContent = 'Generating...';
+        document.getElementById('generateBtn').disabled = true;
+
+        try {
+            const response = await fetch(ADMIN_GENERATE_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ requestsPerDay, validDays })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                document.getElementById('generatedCode').textContent = data.generatedCode;
+                document.getElementById('limitValue').textContent = data.requests;
+                document.getElementById('daysValue').textContent = data.days;
+                
+                document.getElementById('code-output-box').style.display = 'block';
+                updateStatus('code-status', "SUCCESS! Code saved to database. Click code to copy.", true);
+            } else {
+                updateStatus('code-status', `Error: ${data.message || 'Generation failed. Check server logs.'}`, false);
+                document.getElementById('code-output-box').style.display = 'none';
+            }
+        } catch (error) {
+            updateStatus('code-status', 'Network Error. Could not generate code.', false);
+        } finally {
+            document.getElementById('generateBtn').disabled = false;
+        }
+    });
+
+
+    // 3. Manage Users (Display and Action)
+    
+    async function fetchUsers() {
+        if (!adminToken) return updateStatus('user-status-msg', 'Authentication required.', false);
+        updateStatus('user-status-msg', 'Loading user data...', false);
+        
+        try {
+            const response = await fetch(ADMIN_USERS_API, { headers: { 'Authorization': `Bearer ${adminToken}` } });
+            if (response.status === 403) throw new Error("ACCESS DENIED.");
+            const users = await response.json();
+            
+            updateStatus('user-status-msg', 'Data loaded successfully.', true);
+            renderUsers(users, 'users-table-container');
+
+        } catch(error) {
+            updateStatus('user-status-msg', `Error fetching data: ${error.message}`, false);
+            if (error.message.includes("ACCESS DENIED")) adminLogout();
+        }
+    }
+
+    function renderUsers(users, containerId) {
+        if (!users || users.length === 0) return document.getElementById(containerId).innerHTML = '<p>No users found.</p>';
+
+        let html = '<table><thead><tr><th>User</th><th>Email</th><th>Status</th><th>Limit</th><th>Expires</th><th>Action</th></tr></thead><tbody>';
+        
+        users.forEach(u => {
+            const isPremium = u.isPremium && new Date(u.premiumExpiry) > new Date();
+            const actionText = u.maxRequestsPerDay > 1 ? 'Suspend' : 'FREE';
+
+            html += `<tr>
+                <td><strong>${u.username}</strong></td>
+                <td>${u.email}</td>
+                <td>${isPremium ? '✅ PREMIUM' : '👤 Free'}</td>
+                <td>${u.requestsToday}/${u.maxRequestsPerDay}</td>
+                <td>${isPremium ? new Date(u.premiumExpiry).toLocaleDateString() : 'N/A'}</td>
+                <td>
+                    <button class="remove-btn" onclick="suspendUser('${u._id}', ${u.maxRequestsPerDay > 1})">
+                        ${actionText}
+                    </button>
+                </td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById(containerId).innerHTML = html;
+    }
+
+    // 4. Suspend User Action (CONCEPTUAL - Needs Backend Endpoint)
+    window.suspendUser = async (userId, isPremium) => {
+        if (!confirm(`Are you sure you want to suspend user ${userId}? This will reset their limit to 1.`)) return;
+
+        // ⚠️ NEW BACKEND LOGIC REQUIRED HERE
+        updateStatus('user-status-msg', `Suspending user ${userId}...`, false);
+        
+        try {
+            const response = await fetch(ADMIN_SUSPEND_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ userId: userId }) // Backend will reset maxRequestsPerDay to 1
+            });
             
             if (response.ok) {
-                updateNavAndStatus(data);
-                return data;
+                updateStatus('user-status-msg', `User ${userId} successfully suspended.`, true);
+                fetchUsers(); // Refresh the list
             } else {
-                localStorage.removeItem('jwtToken');
-                updateNavAndStatus(null);
+                const data = await response.json();
+                updateStatus('user-status-msg', `Suspension Failed: ${data.message || 'Server error.'}`, false);
             }
-        } catch (error) {
-            localStorage.removeItem('jwtToken');
+        } catch(error) {
+            updateStatus('user-status-msg', 'Network error during suspension.', false);
         }
-        return null;
+    };
+
+
+    // 5. System Logs (Display)
+    function renderLogs(logs, containerId) {
+        if (!logs || logs.length === 0) return document.getElementById(containerId).innerHTML = '<p>No system logs found.</p>';
+        
+        let html = '<table><thead><tr><th>Time</th><th>User</th><th>Status</th><th>Endpoint</th><th>Details</th></tr></thead><tbody>';
+        logs.forEach(l => {
+            const statusClass = l.status === 'SUCCESS' ? 'status-success' : (l.status === 'RATE_LIMIT' ? 'status-limit' : 'status-error');
+            html += `<tr>
+                <td>${new Date(l.timestamp).toLocaleTimeString()}</td>
+                <td>${l.username}</td>
+                <td class="${statusClass}">${l.status}</td>
+                <td>${l.endpoint}</td>
+                <td>${l.details}</td>
+            </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById(containerId).innerHTML = html;
     }
 
-    // --- AUTHENTICATION HANDLERS ---
 
-    // 💡 LOGIN HANDLER (Uses Email)
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const deviceId = await getDeviceID(); 
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        const msgId = 'auth-message';
-        
-        showMessage(msgId, 'Processing login...', false);
-
-        try {
-            const response = await fetch(LOGIN_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, password: password, deviceId: deviceId }) 
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.success && data.token) {
-                localStorage.setItem('jwtToken', data.token);
-                showMessage(msgId, data.message + ' Redirecting...', true);
-                
-                await fetchUserInfo(); 
-                showSection('tool'); // Redirect to tool after login
-            } else {
-                // This handles the "Invalid email or password" error
-                showMessage(msgId, data.message || data.error || 'Authentication failed. Check email and password.', false);
-            }
-        } catch (error) {
-            showMessage(msgId, 'Network error. Could not connect to the server.', false);
-        }
-    });
+    const fetchLogs = () => fetchData(ADMIN_LOGS_API, 'log-status-msg', 'logs-table-container', renderLogs);
 
 
-    function logoutUser() {
-        localStorage.removeItem('jwtToken');
-        updateNavAndStatus(null);
-        showSection('auth'); 
-        showMessage('auth-message', 'Logged out successfully.', true);
-    }
-    
-    // --- NEW HANDLER: Step 1 - Request Code ---
-    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('reg-username').value;
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
-        const msgId = 'auth-message';
-        const deviceId = await getDeviceID();
-        
-        showMessage(msgId, 'Sending verification code...', false);
-
-        try {
-            const response = await fetch(REQUEST_CODE_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password, deviceId })
-            });
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                showMessage(msgId, data.message + ' Redirecting to verification step...', true);
-                toggleAuthView('verify'); // Move to Step 2
-                document.getElementById('verify-username').value = username; // Pre-fill username
-            } else {
-                showMessage(msgId, data.message || data.error || 'Failed to request code.', false);
-            }
-        } catch (error) {
-            showMessage(msgId, 'Network error. Could not connect to the server.', false);
-        }
-    });
-
-    // --- NEW HANDLER: Step 2 - Verify Code and Final Register (Auto-Login) ---
-    document.getElementById('verifyCodeForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('verify-username').value;
-        const code = document.getElementById('verify-code').value;
-        const msgId = 'auth-message';
-        const deviceId = await getDeviceID();
-        
-        showMessage(msgId, 'Verifying code and finalizing registration...', false);
-
-        try {
-            const response = await fetch(VERIFY_REGISTER_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, code, deviceId })
-            });
-            const data = await response.json();
-
-            if (response.ok && data.success && data.token) {
-                localStorage.setItem('jwtToken', data.token);
-                showMessage(msgId, data.message + ' You are now logged in.', true);
-                
-                await fetchUserInfo(); 
-                showSection('tool'); // Success! Auto-Login and Redirect
-            } else {
-                showMessage(msgId, data.message || 'Verification failed.', false);
-            }
-        } catch (error) {
-            showMessage(msgId, 'Network error. Could not connect to the server.', false);
-        }
-    });
-    
-    // --- Other UI/API Logic (renderPackages, selectPackage, redeemCode, handleErrorResponse, formatResponseToTextArt) ---
-
-    function renderPackages() { 
-        const listContainer = document.getElementById('package-cards-container');
-        listContainer.innerHTML = '';
-        
-        const weekly = PACKAGES.filter(p => p.type === 'WEEKLY');
-        const monthly = PACKAGES.filter(p => p.type === 'MONTHLY');
-
-        const createSection = (title, pkgs) => {
-             const titleElement = document.createElement('h4');
-             titleElement.textContent = title;
-             titleElement.style.marginTop = '15px';
-             listContainer.appendChild(titleElement);
-             
-             pkgs.forEach((pkg) => {
-                const card = document.createElement('div');
-                card.className = 'package-card';
-                card.innerHTML = `
-                    <p style="font-size: 1.1em; color: #333;"><strong>${pkg.requests} Requests / Day</strong></p>
-                    <p style="color: #d9534f; margin-top: 5px;">Price: <strong>${pkg.price} LKR</strong> / ${pkg.duration}</p>
-                `;
-                card.onclick = () => selectPackage(pkg.id);
-                listContainer.appendChild(card);
-             });
-        };
-        
-        createSection('Weekly Plans', weekly);
-        createSection('Monthly Plans', monthly);
-    }
-
-    function selectPackage(pkgId) {
-        document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
-        selectedPackage = PACKAGES.find(pkg => pkg.id === pkgId);
-        
-        if (selectedPackage) {
-            const allCards = document.querySelectorAll('.package-card');
-            for(let card of allCards) {
-                if (card.innerHTML.includes('Requests / Day') && card.innerHTML.includes(selectedPackage.price + ' LKR')) {
-                    card.classList.add('selected');
-                    break;
+    // --- Initialization Check ---
+    document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+    // Initial check for existing token
+    if (adminToken) {
+        fetch(ADMIN_USER_INFO_API, { headers: { 'Authorization': `Bearer ${adminToken}` } })
+            .then(res => res.json())
+            .then(userData => {
+                if (userData.role === 'admin') {
+                    setAuthStatus(true, userData.username);
+                } else {
+                    adminLogout();
                 }
-            }
-            
-            document.getElementById('selected-plan').textContent = `${selectedPackage.requests} Requests / Day (${selectedPackage.duration})`;
-            document.getElementById('selected-price').textContent = `${selectedPackage.price} LKR`;
-            showSection('payment-view');
-        }
+            })
+            .catch(() => adminLogout());
+    } else {
+        setAuthStatus(false);
     }
-    
-    async function redeemCode() {
-        const code = document.getElementById('premium-code-input').value.trim();
-        const statusElement = document.getElementById('redemption-status');
-        const token = getAuthToken();
-
-        if (!token) { statusElement.innerHTML = '<span class="error-msg">You must be logged in to redeem a code.</span>'; return; }
-        if (!code) { statusElement.innerHTML = '<span class="error-msg">Please enter the code provided by the Admin.</span>'; return; }
-
-        statusElement.innerHTML = '<span class="success-msg" style="color:#007bff; background:white;">Processing activation...</span>';
-
-        try {
-             const response = await fetch(REDEEM_API, {
-                 method: 'POST',
-                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                 body: JSON.stringify({ code: code })
-             });
-             
-             const result = await response.json();
-             
-             if (response.ok && result.success) {
-                 statusElement.innerHTML = `<span class="success-msg">✅ Success! Plan active for ${result.duration}. Limit: ${result.requests} commands/day.</span>`;
-                 await fetchUserInfo(); 
-             } else {
-                 statusElement.innerHTML = `<span class="error-msg">❌ Activation Failed: ${result.message || 'Invalid or expired code.'}</span>`;
-             }
-
-        } catch (error) {
-             statusElement.innerHTML = '<span class="error-msg">NETWORK ERROR: Could not connect to the activation server.</span>';
-        }
-    }
-
-
-    function handleErrorResponse(errorMessage, statusCode) { 
-        if (statusCode === 429) { return `RATE LIMIT EXCEEDED: You have already made a request today. The limit resets daily at 1:39 AM SLT.`; }
-        
-        const errorText = String(errorMessage).toLowerCase();
-        if (errorText.includes("fraud attempt detected")) {
-             return "FRAUD ATTEMPT DETECTED: It appears you are attempting to cheat. This account or device has already claimed the daily limit. Our policy against cheating is zero tolerance. If this is an honest mistake, please contact us via email to resolve the issue. Fraudulent requests will be rejected.";
-        }
-        if (errorText.includes("invalid uid")) { return "ERROR: Invalid Player ID (UID). Please check the number and try again."; } 
-        if (errorText.includes("uid already used today")) { return "COMMAND TIMEOUT: This UID was processed today. Try again after the daily reset."; }
-        if (errorText.includes("access token provided")) { return "ERROR: Login Required. Please login to continue."; }
-        
-        return `UNKNOWN ERROR: An unexpected issue occurred. Message: "${errorMessage}"`;
-    }
-
-    function formatResponseToTextArt(data) {
-        const res = data.response;
-        const nickname = res.PlayerNickname || 'N/A';
-        const uid = res.UID || 'N/A';
-        const level = res.PlayerLevel || 'N/A';
-        const likesBefore = res.LikesbeforeCommand || 0;
-        const likesAfter = res.LikesafterCommand || 0;
-        const likesGiven = res.LikesGivenByAPI || 0;
-        
-        return `╔════════════════════════════════════════════╗
-║             ⚡ FREE FIRE LIKES ⚡             ║
-╠════════════════════════════════════════════╣
-║ COMMAND STATUS: [SUCCESS]                    ║
-║                                            ║
-║ ✦ Player Name:  ${nickname}
-║ ✦ Player ID:    ${uid}
-║ ✦ Level:        ${level}
-				║                                            ║
-║ ❖ Likes Before:  👍🏻 ${likesBefore}
-║ ❖ Likes After:   👍🏻 ${likesAfter}
-║ ❖ Likes Gained:  🔥 ${likesGiven}
-				║                                            ║
-╠════════════════════════════════════════════╣
-║ > Not For Resale. Copyright Sandaruwan Jayalath ©️
-╚════════════════════════════════════════════╝`;
-    }
-
-    document.getElementById('dataForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); 
-        
-        const token = getAuthToken();
-        const deviceId = await getDeviceID(); 
-        const resultDiv = document.getElementById('result');
-        const submitBtn = document.getElementById('submitBtn');
-
-        if (!token) {
-            resultDiv.innerHTML = '<div class="error-box"><span class="error-text">ERROR: Login Required. Please go to Login/Register tab.</span></div>';
-            showSection('auth');
-            return;
-        }
-
-        const region = document.getElementById('region').value;
-        const uid = document.getElementById('uid').value;
-
-        if (region === '') { resultDiv.innerHTML = `<div class="error-box"><span class="error-text">ERROR: Please select a Region.</span></div>`; return; }
-        if (uid.length < 5 || !/^\d+$/.test(uid)) { resultDiv.innerHTML = `<div class="error-box"><span class="error-text">ERROR: Invalid Player ID format. UID must be a number with at least 5 digits.</span></div>`; return; }
-
-        resultDiv.innerHTML = 'Executing command... Please wait.';
-        submitBtn.disabled = true;
-
-        try {
-            const response = await fetch(LIKES_API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, 
-                body: JSON.stringify({ region: region, uid: uid, deviceId: deviceId })
-            });
-
-            const data = await response.json();
-            
-            if (response.ok && data.status === 1) {
-                const formattedOutput = formatResponseToTextArt(data);
-                resultDiv.textContent = formattedOutput;
-                resultDiv.className = 'success-text-art'; 
-            } else {
-                 let rawErrorMessage = data.error || data.message || JSON.stringify(data);
-                 const userFriendlyMessage = handleErrorResponse(rawErrorMessage, response.status);
-                 resultDiv.innerHTML = `<div class="error-box"><span class="error-text">${userFriendlyMessage}</span></div>`;
-                 resultDiv.className = '';
-            }
-            await fetchUserInfo(); 
-
-        } catch (error) {
-            resultDiv.innerHTML = `<div class="error-box"><span class="error-text">NETWORK ERROR: Could not connect to the proxy server. Check your connection.</span></div>`;
-            resultDiv.className = '';
-        } finally {
-            submitBtn.disabled = false;
-        }
-    });
-
-    // --- FINAL EVENT LISTENERS ---
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault(); 
-        document.getElementById('auth-message').style.display = 'none'; // Clear previous messages
-        document.getElementById('verify-form').style.display = 'none';
-        
-        // Manual form data check included in the event listener body above
-    });
-    
-    document.getElementById('requestCodeForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Logic is within the body of the function above
-    });
-
-    document.getElementById('verifyCodeForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        // Logic is within the body of the function above
-    });
-
-
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Initialization
-        await getDeviceID(); 
-        renderPackages();
-        fetchUserInfo(); 
-        showSection('tool'); 
-    });
 </script>
 
 </body>
