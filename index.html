@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Fire Likes System - Premium Dashboard</title>
     
+    <!-- FingerprintJS for device identification -->
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
     
     <style>
-        /* CSS Styling - Optimized and Cleaned */
+        /* ===== MODERN CSS RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             padding: 20px; 
-            background-color: #f0f2f5; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             display: flex;
             justify-content: center;
@@ -20,565 +27,1689 @@
             min-height: 100vh;
             margin: 0;
         }
+
         .container { 
-            max-width: 480px; 
-            width: 90%;
+            max-width: 500px; 
+            width: 95%;
             padding: 30px; 
             background: #ffffff; 
-            border-radius: 12px; 
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
+            border-radius: 16px; 
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15); 
             text-align: center;
-        }
-        h1 { color: #d9534f; margin-bottom: 10px; }
-        .description { color: #555; margin-bottom: 25px; font-size: 0.95em; }
-        
-        /* Admin Link Header */
-        #admin-link-bar {
-            position: fixed; top: 0; left: 0; width: 100%; background-color: #f0f2f5; 
-            padding: 10px 0; z-index: 1000; text-align: center;
-        }
-        #admin-link-bar a {
-            color: #000; font-weight: bold; text-decoration: none; padding: 8px 15px; border-radius: 4px;
-            background-color: #ff4d4d; color: white; transition: background-color 0.2s;
+            position: relative;
         }
 
-        /* Navigation Tabs FIX (Stylish and Functional) */
-        #nav-tabs { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        /* ===== HEADER STYLES ===== */
+        h1 { 
+            color: #d9534f; 
+            margin-bottom: 10px; 
+            font-size: 1.8em;
+        }
+
+        .description { 
+            color: #666; 
+            margin-bottom: 25px; 
+            font-size: 0.95em; 
+            line-height: 1.4;
+        }
+
+        /* ===== ADMIN LINK BAR ===== */
+        #admin-link-bar {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            padding: 12px 0; 
+            z-index: 1000; 
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        #admin-link-bar a {
+            color: white; 
+            font-weight: bold; 
+            text-decoration: none; 
+            padding: 10px 20px; 
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        #admin-link-bar a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* ===== USER STATUS ===== */
+        #user-status {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            border: 1px solid #e9ecef;
+        }
+
+        .user-status-text { color: #6c757d; }
+        .user-premium-text { color: #28a745; font-weight: bold; }
+
+        /* ===== NAVIGATION TABS ===== */
+        #nav-tabs { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 25px; 
+            border-bottom: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 4px;
+        }
+
         #nav-tabs button {
-            background: none; border: none; color: #555; flex-grow: 1; padding: 12px 2px; margin: 0 1px;
-            font-weight: 600; font-size: 0.85em; white-space: nowrap; border-bottom: 3px solid transparent;
-            transition: color 0.2s, border-bottom 0.2s;
+            background: none; 
+            border: none; 
+            color: #6c757d; 
+            flex: 1; 
+            padding: 12px 8px; 
+            margin: 0 2px;
+            font-weight: 600; 
+            font-size: 0.8em; 
+            white-space: nowrap; 
+            border-radius: 8px;
+            transition: all 0.3s ease;
             cursor: pointer;
         }
-        .nav-active { color: #d9534f !important; border-bottom: 3px solid #d9534f !important; }
 
-        /* Inputs and Buttons */
-        input[type="text"], input[type="password"], input[type="number"], select { 
-            width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; 
-            border: 2px solid #ccc; border-radius: 6px; 
+        .nav-active { 
+            background: white !important; 
+            color: #d9534f !important; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
+        /* ===== FORM STYLES ===== */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        input[type="text"], 
+        input[type="password"], 
+        input[type="number"], 
+        select { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 5px;
+            border: 2px solid #e9ecef; 
+            border-radius: 10px; 
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #d9534f;
+            box-shadow: 0 0 0 3px rgba(217, 83, 79, 0.1);
+            outline: none;
+        }
+
+        /* ===== BUTTON STYLES ===== */
         .action-button, .admin-button { 
-            width: 100%; padding: 14px; background-color: #d9534f; color: white; 
-            font-size: 16px; font-weight: bold; border: none; border-radius: 6px; 
-            cursor: pointer; transition: background-color 0.3s; margin-top: 5px;
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(45deg, #d9534f, #c9302c);
+            color: white; 
+            font-size: 1em; 
+            font-weight: 600; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
-        .secondary-btn { background-color: #5cb85c; }
 
-        /* Text Art Output */
-        #result { white-space: pre; background-color: #1a1a1a; color: #00ff40; border: 1px solid #d9534f; padding: 15px; border-radius: 8px; font-size: 0.9em; overflow-x: auto; font-family: 'Consolas', monospace; line-height: 1.25; text-align: left; }
-        .error-box { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px; word-wrap: break-word; white-space: normal; }
+        .action-button:hover, .admin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(217, 83, 79, 0.3);
+        }
 
-        /* Admin Section Styles */
-        #admin-section h3 { color: #007bff; margin-top: 15px; }
-        .admin-content-sub { margin-top: 10px; padding: 15px; border: 1px solid #eee; border-radius: 6px; text-align: left; }
-        .admin-sub-nav button { background-color: #555; color: white; border-radius: 0; padding: 8px; }
-        .admin-sub-nav-active { background-color: #d9534f !important; color: white !important; }
-        .admin-sub-nav { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .data-section table { width: 100%; font-size: 0.8em; }
+        .secondary-btn { 
+            background: linear-gradient(45deg, #5cb85c, #449d44);
+        }
+
+        .secondary-btn:hover {
+            box-shadow: 0 6px 20px rgba(92, 184, 92, 0.3);
+        }
+
+        /* ===== MESSAGE BOXES ===== */
+        .message-box {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* ===== RESULT DISPLAY ===== */
+        #result {
+            white-space: pre-wrap;
+            background: #1a1a1a;
+            color: #00ff40;
+            border: 1px solid #d9534f;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            line-height: 1.4;
+            text-align: left;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+
+        /* ===== PACKAGE CARDS ===== */
+        .package-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .package-card:hover {
+            border-color: #d9534f;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .package-card.selected {
+            border-color: #d9534f;
+            background: linear-gradient(135deg, #fff5f5, #ffffff);
+            box-shadow: 0 8px 25px rgba(217, 83, 79, 0.15);
+        }
+
+        .package-card h3 {
+            color: #d9534f;
+            margin-bottom: 10px;
+        }
+
+        .package-card .price {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #28a745;
+            margin: 10px 0;
+        }
+
+        /* ===== ADMIN STYLES ===== */
+        #admin-section h3 {
+            color: #007bff;
+            margin: 20px 0 15px 0;
+            text-align: center;
+        }
+
+        .admin-content-sub {
+            margin-top: 15px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            text-align: left;
+            background: #f8f9fa;
+        }
+
+        .admin-sub-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .admin-sub-nav button {
+            flex: 1;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .admin-sub-nav-active {
+            background: linear-gradient(45deg, #007bff, #0056b3) !important;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .data-section {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .data-section table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75em;
+        }
+
+        .data-section th,
+        .data-section td {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        .data-section th {
+            background: #007bff;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-section tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        /* ===== PAYMENT SECTION ===== */
+        .payment-info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .payment-details {
+            text-align: left;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+        .crypto-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        /* ===== CONTACT SECTION ===== */
+        .contact-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .contact-section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .contact-section a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .contact-section a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== LOADING & STATUS ===== */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .status-msg {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .generated-code-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .generated-code-box code {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #155724;
+            cursor: pointer;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            display: block;
+            margin: 10px 0;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            #nav-tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            #nav-tabs button {
+                margin: 2px 0;
+            }
+
+            .admin-sub-nav {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .data-section {
+                font-size: 0.7em;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* ===== SCROLLBAR STYLING ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d9534f;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c9302c;
+        }
     </style>
 </head>
 <body>
 
+<!-- Admin Access Bar -->
 <div id="admin-link-bar">
-    <a href="#" onclick="showSection('admin')">ADMIN PANEL</a>
+    <a href="#" onclick="showSection('admin')">🔧 ADMIN PANEL</a>
 </div>
 
-<div class="container" style="margin-top: 50px;">
-    <h1>Free Fire Like System</h1>
-    <p class="description">Secure Premium Access for Enhanced Features.</p>
+<!-- Main Container -->
+<div class="container" style="margin-top: 60px;">
+    <!-- Header -->
+    <h1>🎯 Free Fire Likes System</h1>
+    <p class="description">Premium Access for Enhanced Free Fire Features</p>
     
+    <!-- User Status -->
     <div id="user-status">
-        Status: <span id="auth-status" class="user-status-text">Logged Out</span>
-        | Plan: <span id="plan-status" class="user-premium-text">Free (1/day)</span>
+        <strong>Status:</strong> <span id="auth-status" class="user-status-text">Checking...</span>
+        | <strong>Plan:</strong> <span id="plan-status" class="user-status-text">Free (1/day)</span>
     </div>
 
+    <!-- Navigation Tabs -->
     <div id="nav-tabs">
-        <button id="tab-auth" onclick="showSection('auth')">Login/Register</button>
-        <button id="tab-tool" onclick="showSection('tool')" class="nav-active">Get Likes</button>
-        <button id="tab-premium" onclick="showSection('premium')">Get Premium</button>
-        <button id="tab-admin" onclick="showSection('admin')">Admin</button> 
+        <button id="tab-auth" onclick="showSection('auth')">🔐 Login/Register</button>
+        <button id="tab-tool" onclick="showSection('tool')" class="nav-active">⚡ Get Likes</button>
+        <button id="tab-premium" onclick="showSection('premium')">💎 Premium</button>
+        <button id="tab-admin" onclick="showSection('admin')">🔧 Admin</button>
     </div>
 
+    <!-- ===== AUTHENTICATION SECTION ===== -->
     <div id="auth-section" style="display: none;">
         <h2>User Authentication</h2>
-        <div id="auth-message" class="message-box"></div>
+        <div id="auth-message" class="message-box" style="display: none;"></div>
 
+        <!-- Login Form -->
         <div id="login-form">
-            <h3>Login</h3>
+            <h3>🔐 Login to Your Account</h3>
             <form id="loginForm">
-                <label for="login-email">Email Address:</label>
-                <input type="text" id="login-email" required> 
-                <label for="login-password">Password:</label>
-                <input type="password" id="login-password" required>
-                <button type="submit">Login</button>
+                <div class="form-group">
+                    <label for="login-email">📧 Email Address:</label>
+                    <input type="text" id="login-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">🔒 Password:</label>
+                    <input type="password" id="login-password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="action-button">🚀 Login to Account</button>
             </form>
-            <p style="margin-top: 15px;">No account? <a href="#" onclick="toggleAuthView('register')">Register here</a></p>
+            <p style="margin-top: 20px; color: #666;">
+                Don't have an account? 
+                <a href="#" onclick="toggleAuthView('register')" style="color: #007bff;">Register here</a>
+            </p>
         </div>
 
+        <!-- Register Form -->
         <div id="register-form" style="display:none;">
-            <h3>Register (Step 1: Request Code)</h3>
+            <h3>📝 Create New Account</h3>
             <form id="requestCodeForm">
-                <label for="reg-username">Username:</label>
-                <input type="text" id="reg-username" required>
-                <label for="reg-email">Email:</label>
-                <input type="text" id="reg-email" placeholder="Verification code will be sent here" required>
-                <label for="reg-password">Password:</label>
-                <input type="password" id="reg-password" required>
-                <button type="submit" class="secondary-btn">Request Verification Code</button>
+                <div class="form-group">
+                    <label for="reg-username">👤 Username:</label>
+                    <input type="text" id="reg-username" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">📧 Email Address:</label>
+                    <input type="text" id="reg-email" placeholder="Verification code will be sent here" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">🔒 Password:</label>
+                    <input type="password" id="reg-password" placeholder="Create a strong password" required>
+                </div>
+                <button type="submit" class="action-button secondary-btn">📨 Request Verification Code</button>
             </form>
-            <p style="margin-top: 15px;">Already have an account? <a href="#" onclick="toggleAuthView('login')">Login here</a></p>
-            <p style="margin-top: 10px;">Already have a code? <a href="#" onclick="toggleAuthView('verify')">Verify here</a></p>
+            <p style="margin-top: 20px; color: #666;">
+                Already have an account? 
+                <a href="#" onclick="toggleAuthView('login')" style="color: #007bff;">Login here</a>
+            </p>
+            <p style="margin-top: 10px; color: #666;">
+                Already have a code? 
+                <a href="#" onclick="toggleAuthView('verify')" style="color: #007bff;">Verify here</a>
+            </p>
         </div>
         
+        <!-- Verify Form -->
         <div id="verify-form" style="display:none;">
-            <h3>Register (Step 2: Verify Code)</h3>
+            <h3>✅ Verify Your Account</h3>
             <form id="verifyCodeForm">
-                <label for="verify-username">Username:</label>
-                <input type="text" id="verify-username" placeholder="Enter your requested username" required>
-                <label for="verify-code">Verification Code:</label>
-                <input type="text" id="verify-code" placeholder="Enter the 6-digit code from email" required>
-                <button type="submit" class="secondary-btn">Verify and Register</button>
+                <div class="form-group">
+                    <label for="verify-username">👤 Username:</label>
+                    <input type="text" id="verify-username" placeholder="Enter your requested username" required>
+                </div>
+                <div class="form-group">
+                    <label for="verify-code">🔢 Verification Code:</label>
+                    <input type="text" id="verify-code" placeholder="Enter the 6-digit code from email" required>
+                </div>
+                <button type="submit" class="action-button secondary-btn">✅ Verify and Register</button>
             </form>
-            <p style="margin-top: 15px;">Need a new code? <a href="#" onclick="toggleAuthView('register')">Request new code</a></p>
+            <p style="margin-top: 20px; color: #666;">
+                Need a new code? 
+                <a href="#" onclick="toggleAuthView('register')" style="color: #007bff;">Request new code</a>
+            </p>
         </div>
         
-        <button id="logout-btn" onclick="logoutUser()" style="display:none; background-color: #ff4d4d; margin-top: 20px;">Logout</button>
+        <!-- Logout Button -->
+        <button id="logout-btn" onclick="logoutUser()" style="display:none; background: linear-gradient(45deg, #6c757d, #495057); margin-top: 20px;">
+            🚪 Logout
+        </button>
     </div>
 
+    <!-- ===== MAIN TOOL SECTION ===== -->
     <div id="tool-section">
+        <h2>⚡ Get Free Fire Likes</h2>
         <form id="dataForm">
-            <label for="region">Select Region:</label>
-            <select id="region" name="region" required>
-                <option value="">-- Select a Region --</option>
+            <div class="form-group">
+                <label for="region">🌍 Select Region:</label>
+                <select id="region" name="region" required>
+                    <option value="">-- Choose Your Region --</option>
+                    <!-- Regions will be populated by JavaScript -->
                 </select>
+            </div>
 
-            <label for="uid">Enter Game ID (UID):</label>
-            <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
+            <div class="form-group">
+                <label for="uid">🎮 Enter Game ID (UID):</label>
+                <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
+            </div>
 
-            <button type="submit" id="submitBtn" class="action-button">Execute Likes Command</button>
+            <button type="submit" id="submitBtn" class="action-button">
+                🚀 Execute Likes Command
+            </button>
         </form>
 
-        <h2>Your Request Status</h2>
-        <div id="result">Please Login to use the service.</div>
+        <h2 style="margin-top: 25px;">📊 Request Status</h2>
+        <div id="result">Please login to use the service. 👆</div>
     </div>
     
+    <!-- ===== PREMIUM SECTION ===== -->
     <div id="premium-section" style="display: none;">
-        
+        <!-- Package Selection -->
         <div id="package-list">
-            <h2>Select a Premium Plan</h2>
+            <h2>💎 Select Premium Plan</h2>
+            <p style="color: #666; margin-bottom: 20px;">Choose your preferred package and payment method</p>
             <div id="package-cards-container">
-                </div>
+                <!-- Packages will be populated by JavaScript -->
+            </div>
         </div>
 
+        <!-- Payment View -->
         <div id="payment-view" style="display: none;">
-            <h2>Payment Instructions</h2>
+            <h2>💳 Payment Instructions</h2>
             
             <div class="payment-info-box">
-                <p><strong>Selected Plan:</strong> <span id="selected-plan">N/A</span></p>
-                <p><strong>Price:</strong> <span id="selected-price">N/A</span></p>
+                <p><strong>Selected Plan:</strong> <span id="selected-plan" style="color: #d9534f;">N/A</span></p>
+                <p><strong>Price:</strong> <span id="selected-price" style="color: #28a745;">N/A</span> LKR</p>
             </div>
             
             <div class="payment-details">
-                <h3 style="color:#d9534f; margin-top:15px;">Local Payment Methods (LKR)</h3>
-                <p><strong>1. Ez Cash:</strong> 0762332957</p>
+                <h3 style="color:#d9534f; margin:20px 0 15px 0;">🇱🇰 Local Payment Methods (LKR)</h3>
                 
-                <h4 style="margin-top:10px;">2. Bank Transfer (Commercial Bank)</h4>
-                <p><strong>Account Name:</strong> WOS JAYALATH</p>
-                <p><strong>Account Number:</strong> 8012396005</p>
-                <p><strong>Branch:</strong> Head Office Branch</p>
-                <p style="margin-top:10px;"><strong>3. Dialog Finance Plc:</strong> 001020027802</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    <p><strong>1. Ez Cash / Mobi Cash:</strong></p>
+                    <p style="font-size: 1.1em; color: #d9534f; font-weight: bold;">076 233 2957</p>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <h4 style="color: #495057;">2. Bank Transfer (Commercial Bank)</h4>
+                    <p><strong>Account Name:</strong> WOS JAYALATH</p>
+                    <p><strong>Account Number:</strong> 8012396005</p>
+                    <p><strong>Branch:</strong> Head Office Branch</p>
+                </div>
 
-                <h3 style="color:#d9534f; margin-top:15px;">International Users (Crypto)</h3>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <p><strong>3. Dialog Finance Plc:</strong> 001020027802</p>
+                </div>
+
+                <h3 style="color:#d9534f; margin:25px 0 15px 0;">🌍 International Users (Crypto)</h3>
                 <div class="crypto-note">
-                    <p>Note: 305 LKR ≈ 1 USDT</p>
+                    <p><strong>💱 Exchange Rate:</strong> 305 LKR ≈ 1 USDT</p>
                     <p><strong>Bybit ID:</strong> 133761830</p>
                     <p><strong>Binance ID:</strong> 473713483</p>
                 </div>
                 
-                <p style="color: #d9534f; font-weight: bold; margin-top: 20px;">
-                    ⚠️ ACTION REQUIRED: After payment, contact the Admin with proof to receive your unique Premium Code.
-                </p>
-                <p style="font-size: 0.8em; color: #777;">
-                    * Half Payment is fully refundable.
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                    <p style="color: #856404; font-weight: bold; margin: 0;">
+                        ⚠️ ACTION REQUIRED: After payment, contact Admin with proof to receive your Premium Code.
+                    </p>
+                </div>
+                <p style="font-size: 0.85em; color: #6c757d; text-align: center;">
+                    * All payments are secure and verified
                 </p>
             </div>
-            <button onclick="showSection('package-selection')" class="secondary-btn">← Back to Packages</button>
+            <button onclick="showSection('premium')" class="action-button secondary-btn" style="margin-top: 20px;">
+                ← Back to Packages
+            </button>
         </div>
 
+        <!-- Code Redemption -->
         <div id="redemption-section" style="margin-top: 30px;">
-            <h2>Activate Your Plan</h2>
-            <p style="color: #555; font-size: 0.95em; margin-bottom: 10px;">Enter the Premium Code received from the Admin after payment.</p>
-            <input type="text" id="premium-code-input" placeholder="Enter your Premium Code">
-            <button id="redeem-btn" onclick="redeemCode()" class="action-button secondary-btn">Activate Plan</button>
-            <p id="redemption-status" style="margin-top: 10px;"></p>
+            <h2>🎁 Activate Your Premium</h2>
+            <p style="color: #666; margin-bottom: 15px;">Enter the Premium Code received from Admin after payment</p>
+            <div class="form-group">
+                <input type="text" id="premium-code-input" placeholder="Enter your Premium Code here" style="text-align: center; font-size: 1.1em;">
+            </div>
+            <button id="redeem-btn" onclick="redeemCode()" class="action-button secondary-btn">
+                ✅ Activate Premium Plan
+            </button>
+            <p id="redemption-status" style="margin-top: 15px; padding: 10px; border-radius: 8px;"></p>
         </div>
-
     </div>
     
+    <!-- ===== ADMIN SECTION ===== -->
     <div id="admin-section" style="display: none;">
-        <h2 style="color: #007bff; margin-bottom: 20px;">Admin Control Panel</h2>
+        <h2 style="color: #007bff; margin-bottom: 20px;">🔧 Admin Control Panel</h2>
         
+        <!-- Admin Sub Navigation -->
         <div id="admin-sub-nav" class="admin-sub-nav">
-            <button class="admin-button secondary-btn admin-sub-nav-active" style="width: 30%; background-color: #5cb85c;" onclick="showAdminSubSection('code-gen')">Codes</button>
-            <button class="admin-button secondary-btn" style="width: 30%; background-color: #007bff;" onclick="showAdminSubSection('user-mgmt')">Users</button>
-            <button class="admin-button secondary-btn" style="width: 30%; background-color: #007bff;" onclick="showAdminSubSection('system-logs')">Logs</button>
+            <button class="admin-sub-nav-active" onclick="showAdminSubSection('code-gen')">🎫 Codes</button>
+            <button onclick="showAdminSubSection('user-mgmt')">👥 Users</button>
+            <button onclick="showAdminSubSection('system-logs')">📋 Logs</button>
+            <button onclick="showAdminSubSection('system-stats')">📊 Stats</button>
         </div>
         
-        <div id="code-gen-section" class="admin-content-sub" style="display: block;">
-            <h3>Code Generation & Management</h3>
+        <!-- Code Generation Section -->
+        <div id="code-gen-section" class="admin-content-sub">
+            <h3>🎫 Premium Code Management</h3>
             <form id="generatorForm">
-                <div class="input-group">
-                    <label style="width: 30%;">Requests/Day: <input type="number" id="requests" min="1" max="100" required value="50"></label>
-                    <label style="width: 30%;">Duration (Days): <select id="days" required><option value="7">7 Days</option><option value="30">30 Days</option><option value="365">365 Days</option></select></label>
-                    <label style="width: 40%;">Admin Key (Secured): <input type="password" id="dummyKey" disabled value="Secured"></label>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 120px;">
+                        <label>Requests/Day:</label>
+                        <input type="number" id="requests" min="1" max="100" value="50" required style="width: 100%;">
+                    </div>
+                    <div style="flex: 1; min-width: 120px;">
+                        <label>Duration:</label>
+                        <select id="days" required style="width: 100%;">
+                            <option value="7">7 Days</option>
+                            <option value="30">30 Days</option>
+                            <option value="365">365 Days</option>
+                        </select>
+                    </div>
                 </div>
-                <button type="submit" style="background-color: #d9534f;">Generate and Save Code</button>
+                <button type="submit" class="action-button">🎲 Generate Premium Code</button>
             </form>
-            <p id="code-status" class="status-msg" style="display:none;"></p>
+            
             <div id="code-output-box" class="generated-code-box" style="display:none;">
-                <p>Generated Code:</p>
-                <code id="generatedCode" onclick="copyCode(this)">CODE HERE</code>
-                <p style="font-size: 0.8em; color: #333;">Click to Copy | Limit: <span id="limitValue"></span> reqs / Days: <span id="daysValue"></span></p>
+                <p><strong>✨ Generated Premium Code:</strong></p>
+                <code id="generatedCode" onclick="copyCode(this)">LOADING...</code>
+                <p style="font-size: 0.85em; color: #666;">
+                    📋 Click to Copy | 🎯 Limit: <span id="limitValue">50</span> reqs/day | 📅 Days: <span id="daysValue">7</span>
+                </p>
             </div>
             
-            <h4 style="margin-top: 30px;">Code Review (Active & Used Codes)</h4>
-            <p id="code-review-status-msg" class="status-msg" style="display:none;">Loading codes...</p>
-            <div id="code-review-table-container" class="data-section"></div>
+            <h4 style="margin: 25px 0 15px 0;">📋 Active & Used Codes</h4>
+            <div id="code-review-table-container" class="data-section">
+                <p style="text-align: center; color: #666; padding: 20px;">Loading codes...</p>
+            </div>
         </div>
 
+        <!-- User Management Section -->
         <div id="user-mgmt-section" class="admin-content-sub" style="display: none;">
-             <h3>User Management (Suspend/Activate)</h3>
-             <div class="input-group">
-                <input type="text" id="userSearch" placeholder="Search by Username, Email or ID...">
-                <button onclick="fetchUsers()" style="width: 30%; background-color: #007bff; padding: 10px 15px;">Refresh Users</button>
+            <h3>👥 User Management</h3>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="userSearch" placeholder="Search users..." style="flex: 1;">
+                <button onclick="fetchUsers()" class="secondary-btn" style="width: auto; padding: 12px 20px;">
+                    🔄 Refresh
+                </button>
             </div>
-             <p id="user-status-msg" class="status-msg" style="display:none;">Loading user data...</p>
-             <div id="users-table-container" class="data-section"></div>
+            <div id="users-table-container" class="data-section">
+                <p style="text-align: center; color: #666; padding: 20px;">Loading users...</p>
+            </div>
         </div>
         
+        <!-- System Logs Section -->
         <div id="system-logs-section" class="admin-content-sub" style="display: none;">
-             <h3>System Logs (Last 100)</h3>
-             <button onclick="fetchLogs()" style="width: auto; background-color: #007bff; padding: 10px 20px;">Refresh Logs</button>
-             <p id="log-status-msg" class="status-msg" style="display:none;">Loading log data...</p>
-             <div id="logs-table-container" class="data-section"></div>
+            <h3>📋 System Activity Logs</h3>
+            <button onclick="fetchLogs()" class="secondary-btn" style="width: auto; padding: 12px 25px; margin-bottom: 15px;">
+                🔄 Refresh Logs
+            </button>
+            <div id="logs-table-container" class="data-section">
+                <p style="text-align: center; color: #666; padding: 20px;">Loading logs...</p>
+            </div>
+        </div>
+
+        <!-- System Statistics Section -->
+        <div id="system-stats-section" class="admin-content-sub" style="display: none;">
+            <h3>📊 System Statistics</h3>
+            <button onclick="fetchStats()" class="secondary-btn" style="width: auto; padding: 12px 25px; margin-bottom: 15px;">
+                🔄 Refresh Stats
+            </button>
+            <div id="stats-container">
+                <p style="text-align: center; color: #666; padding: 20px;">Loading statistics...</p>
+            </div>
         </div>
     </div>
 
+    <!-- ===== CONTACT SECTION ===== -->
     <div class="contact-section">
-        <h2 style="text-align: center;">Contact Us</h2>
-        <strong>Email:</strong> <a href="mailto:wosandaruwanjayalath@gmail.com">wosandaruwanjayalath@gmail.com</a><br>
-        <strong>Facebook:</strong> <a href="https://www.facebook.com/sandaruwan.verified" target="_blank">Sandaruwan Jayalath</a><br>
-        <strong>Mobile:</strong> 0762332957 <small>(Please call 6.00 pm to 9.00 pm on weekdays)</small>
+        <h2>📞 Contact & Support</h2>
+        <div style="text-align: left; line-height: 1.6;">
+            <p><strong>📧 Email:</strong> 
+                <a href="mailto:wosandaruwanjayalath@gmail.com">wosandaruwanjayalath@gmail.com</a>
+            </p>
+            <p><strong>👤 Facebook:</strong> 
+                <a href="https://www.facebook.com/sandaruwan.verified" target="_blank">Sandaruwan Jayalath</a>
+            </p>
+            <p><strong>📱 Mobile:</strong> 0762332957 
+                <small style="color: #666;">(Available 6:00 PM - 9:00 PM on weekdays)</small>
+            </p>
+        </div>
     </div>
 </div>
 
+<!-- ===== JAVASCRIPT ===== -->
 <script>
-    // --- Configuration (UPDATE THIS BASE URL!) ---
-    const BASE_URL = 'https://freefirewebbackend-production.up.railway.app';
-    const LOGIN_API = `${BASE_URL}/api/login`;
-    const REQUEST_CODE_API = `${BASE_URL}/api/request-code`; 
-    const VERIFY_REGISTER_API = `${BASE_URL}/api/verify-and-register`; 
-    const LIKES_API = `${BASE_URL}/api/get-likes`;
-    const REDEEM_API = `${BASE_URL}/api/redeem`;
-    const USER_INFO_API = `${BASE_URL}/api/user-info`; 
-    const ADMIN_GENERATE_API = `${BASE_URL}/api/admin/generate-code`;
-    const ADMIN_USERS_API = `${BASE_URL}/api/admin/users`;
-    const ADMIN_LOGS_API = `${BASE_URL}/api/admin/logs`;
-    const ADMIN_CODE_REVIEW_API = `${BASE_URL}/api/admin/codes`; 
-    const ADMIN_SUSPEND_API = `${BASE_URL}/api/admin/suspend-user`; 
-    const ADMIN_REMOVE_CODE_API = `${BASE_URL}/api/admin/remove-code`; 
+    // ===== CONFIGURATION =====
+    const BASE_URL = window.location.origin; // Auto-detect backend URL
+    const API_ENDPOINTS = {
+        LOGIN: `${BASE_URL}/api/login`,
+        REQUEST_CODE: `${BASE_URL}/api/request-code`,
+        VERIFY_REGISTER: `${BASE_URL}/api/verify-and-register`,
+        LIKES: `${BASE_URL}/api/get-likes`,
+        REDEEM: `${BASE_URL}/api/redeem`,
+        USER_INFO: `${BASE_URL}/api/user-info`,
+        LOGOUT: `${BASE_URL}/api/logout`,
+        HEALTH: `${BASE_URL}/api/health`,
+        
+        // Admin endpoints
+        ADMIN_GENERATE: `${BASE_URL}/api/admin/generate-code`,
+        ADMIN_USERS: `${BASE_URL}/api/admin/users`,
+        ADMIN_LOGS: `${BASE_URL}/api/admin/logs`,
+        ADMIN_CODES: `${BASE_URL}/api/admin/codes`,
+        ADMIN_STATS: `${BASE_URL}/api/admin/stats`,
+        ADMIN_SUSPEND: `${BASE_URL}/api/admin/suspend-user`,
+        ADMIN_REMOVE_CODE: `${BASE_URL}/api/admin/remove-code`
+    };
 
-    // 💡 PACKAGE DATA AND REGIONS (CRITICAL DATA RESTORED)
+    // Package Data
     const PACKAGES = [
-        { id: 101, requests: 2, price: 50, duration: '7 days', type: 'WEEKLY' }, { id: 102, requests: 5, price: 125, duration: '7 days', type: 'WEEKLY' },
-        { id: 103, requests: 10, price: 250, duration: '7 days', type: 'WEEKLY' }, { id: 104, requests: 20, price: 500, duration: '7 days', type: 'WEEKLY' },
-        { id: 105, requests: 30, price: 750, duration: '7 days', type: 'WEEKLY' }, { id: 106, requests: 40, price: 1000, duration: '7 days', type: 'WEEKLY' },
-        { id: 107, requests: 50, price: 1250, duration: '7 days', type: 'WEEKLY' }, { id: 108, requests: 60, price: 1500, duration: '7 days', type: 'WEEKLY' },
-        { id: 109, requests: 70, price: 1750, duration: '7 days', type: 'WEEKLY' }, { id: 110, requests: 80, price: 2000, duration: '7 days', type: 'WEEKLY' },
-        { id: 111, requests: 90, price: 2250, duration: '7 days', type: 'WEEKLY' }, { id: 112, requests: 100, price: 2500, duration: '7 days', type: 'WEEKLY' },
-        { id: 201, requests: 2, price: 170, duration: '30 days', type: 'MONTHLY' }, { id: 202, requests: 5, price: 425, duration: '30 days', type: 'MONTHLY' },
-        { id: 203, requests: 10, price: 850, duration: '30 days', type: 'MONTHLY' }, { id: 204, requests: 20, price: 1700, duration: '30 days', type: 'MONTHLY' },
-        { id: 205, requests: 30, price: 2550, duration: '30 days', type: 'MONTHLY' }, { id: 206, requests: 40, price: 3400, duration: '30 days', type: 'MONTHLY' },
-        { id: 207, requests: 50, price: 4250, duration: '30 days', type: 'MONTHLY' }, { id: 208, requests: 60, price: 5100, duration: '30 days', type: 'MONTHLY' },
-        { id: 209, requests: 70, price: 5950, duration: '30 days', type: 'MONTHLY' }, { id: 210, requests: 80, price: 6800, duration: '30 days', type: 'MONTHLY' },
-        { id: 211, requests: 90, price: 7650, duration: '30 days', type: 'MONTHLY' }, { id: 212, requests: 100, price: 8500, duration: '30 days', type: 'MONTHLY' },
+        // Weekly Packages
+        { id: 101, requests: 2, price: 50, duration: '7 days', type: 'WEEKLY' },
+        { id: 102, requests: 5, price: 125, duration: '7 days', type: 'WEEKLY' },
+        { id: 103, requests: 10, price: 250, duration: '7 days', type: 'WEEKLY' },
+        { id: 104, requests: 20, price: 500, duration: '7 days', type: 'WEEKLY' },
+        { id: 105, requests: 30, price: 750, duration: '7 days', type: 'WEEKLY' },
+        { id: 106, requests: 40, price: 1000, duration: '7 days', type: 'WEEKLY' },
+        { id: 107, requests: 50, price: 1250, duration: '7 days', type: 'WEEKLY' },
+        { id: 108, requests: 60, price: 1500, duration: '7 days', type: 'WEEKLY' },
+        { id: 109, requests: 70, price: 1750, duration: '7 days', type: 'WEEKLY' },
+        { id: 110, requests: 80, price: 2000, duration: '7 days', type: 'WEEKLY' },
+        { id: 111, requests: 90, price: 2250, duration: '7 days', type: 'WEEKLY' },
+        { id: 112, requests: 100, price: 2500, duration: '7 days', type: 'WEEKLY' },
+        
+        // Monthly Packages
+        { id: 201, requests: 2, price: 170, duration: '30 days', type: 'MONTHLY' },
+        { id: 202, requests: 5, price: 425, duration: '30 days', type: 'MONTHLY' },
+        { id: 203, requests: 10, price: 850, duration: '30 days', type: 'MONTHLY' },
+        { id: 204, requests: 20, price: 1700, duration: '30 days', type: 'MONTHLY' },
+        { id: 205, requests: 30, price: 2550, duration: '30 days', type: 'MONTHLY' },
+        { id: 206, requests: 40, price: 3400, duration: '30 days', type: 'MONTHLY' },
+        { id: 207, requests: 50, price: 4250, duration: '30 days', type: 'MONTHLY' },
+        { id: 208, requests: 60, price: 5100, duration: '30 days', type: 'MONTHLY' },
+        { id: 209, requests: 70, price: 5950, duration: '30 days', type: 'MONTHLY' },
+        { id: 210, requests: 80, price: 6800, duration: '30 days', type: 'MONTHLY' },
+        { id: 211, requests: 90, price: 7650, duration: '30 days', type: 'MONTHLY' },
+        { id: 212, requests: 100, price: 8500, duration: '30 days', type: 'MONTHLY' },
     ];
-    
-    // Regions List (Used to populate the select dropdown)
+
+    // Regions List
     const REGIONS = [
         { value: 'sg', name: 'Singapore (sg)' },
         { value: 'in', name: 'India (in)' },
         { value: 'id', name: 'Indonesia (id)' },
         { value: 'br', name: 'Brazil (br)' },
-        { value: 'na', name: 'North America (na)' }
+        { value: 'na', name: 'North America (na)' },
+        { value: 'eu', name: 'Europe (eu)' },
+        { value: 'tr', name: 'Turkey (tr)' },
+        { value: 'pk', name: 'Pakistan (pk)' }
     ];
 
+    // Global Variables
+    let currentUser = null;
     let selectedPackage = null;
-    let adminData = null; // Store user data after login
-    
-    // --- UTILITIES AND UI MANAGEMENT ---
+    let deviceId = null;
 
-    function getAuthToken() { return localStorage.getItem('jwtToken'); }
+    // ===== UTILITY FUNCTIONS =====
+    function getAuthToken() {
+        return localStorage.getItem('jwtToken');
+    }
+
+    function setAuthToken(token) {
+        if (token) {
+            localStorage.setItem('jwtToken', token);
+        } else {
+            localStorage.removeItem('jwtToken');
+        }
+    }
 
     function showMessage(elementId, message, isSuccess = false) {
-        const el = document.getElementById(elementId);
-        el.textContent = message;
-        el.className = `message-box ${isSuccess ? 'success-msg' : 'error-msg'}`;
-        el.style.display = 'block';
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.className = `message-box ${isSuccess ? 'success-msg' : 'error-msg'}`;
+        element.style.display = 'block';
+        
+        // Auto-hide success messages after 5 seconds
+        if (isSuccess) {
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
     }
-    
+
+    function showLoading(button, isLoading = true) {
+        if (isLoading) {
+            button.disabled = true;
+            button.innerHTML = '⏳ Processing...';
+            button.classList.add('loading');
+        } else {
+            button.disabled = false;
+            button.classList.remove('loading');
+            // Reset button text based on context
+            if (button.type === 'submit') {
+                const form = button.closest('form');
+                if (form.id === 'loginForm') button.innerHTML = '🚀 Login to Account';
+                else if (form.id === 'dataForm') button.innerHTML = '🚀 Execute Likes Command';
+            }
+        }
+    }
+
     async function getDeviceID() {
+        if (deviceId) return deviceId;
+        
         try {
-            if (typeof FingerprintJS === 'undefined') return 'error-fpjs-missing';
+            if (typeof FingerprintJS === 'undefined') {
+                deviceId = 'fpjs-unavailable-' + Math.random().toString(36).substr(2, 9);
+                return deviceId;
+            }
+            
             const fp = await FingerprintJS.load();
             const result = await fp.get();
-            return result.visitorId;
-        } catch (e) {
-            return 'error-device';
+            deviceId = result.visitorId;
+            return deviceId;
+        } catch (error) {
+            console.error('Fingerprint error:', error);
+            deviceId = 'error-' + Math.random().toString(36).substr(2, 9);
+            return deviceId;
         }
     }
-    
-    // Renders the correct section based on tab click (FIXED NAVIGATION)
+
+    // ===== UI MANAGEMENT FUNCTIONS =====
     function showSection(sectionId) {
-        // Hide all major sections
-        document.getElementById('auth-section').style.display = 'none';
-        document.getElementById('tool-section').style.display = 'none';
-        document.getElementById('premium-section').style.display = 'none';
-        document.getElementById('admin-section').style.display = 'none'; 
-        document.getElementById('payment-view').style.display = 'none';
-        document.getElementById('package-list').style.display = 'none';
+        // Hide all sections
+        const sections = ['auth', 'tool', 'premium', 'admin'];
+        sections.forEach(section => {
+            document.getElementById(`${section}-section`).style.display = 'none';
+        });
 
-        // Reset nav bar highlighting
-        document.querySelectorAll('#nav-tabs button').forEach(el => el.classList.remove('nav-active'));
+        // Reset navigation
+        document.querySelectorAll('#nav-tabs button').forEach(btn => {
+            btn.classList.remove('nav-active');
+        });
 
-        if (sectionId === 'admin') { // CRITICAL: Admin Tab Logic
-            if (adminData && adminData.role === 'admin') { 
-                document.getElementById('admin-section').style.display = 'block';
-                document.getElementById('tab-admin').classList.add('nav-active');
-                showAdminSubSection('code-gen'); // Show Code Generator by default
+        // Show selected section
+        document.getElementById(`${sectionId}-section`).style.display = 'block';
+        document.getElementById(`tab-${sectionId}`).classList.add('nav-active');
+
+        // Special handling for specific sections
+        if (sectionId === 'auth') {
+            toggleAuthView('login');
+        } else if (sectionId === 'premium') {
+            renderPackages();
+        } else if (sectionId === 'admin') {
+            if (currentUser && currentUser.role === 'admin') {
+                showAdminSubSection('code-gen');
             } else {
-                 // Unauthorized access - Redirect to auth
-                 showSection('auth');
-                 showMessage('auth-message', 'Admin access required for this tab.', false);
+                showSection('auth');
+                showMessage('auth-message', '🔒 Admin access required. Please login as administrator.', false);
             }
-            return; 
         }
-        
-        // General Tabs Logic (User/Guest)
-        document.getElementById('tab-' + sectionId).classList.add('nav-active');
-        document.getElementById(sectionId + '-section').style.display = 'block';
-
-        if (sectionId === 'auth') toggleAuthView('login');
-        if (sectionId === 'premium') renderPackages();
     }
-    
-    // Renders the correct sub-section within the Admin Panel
+
     function showAdminSubSection(subSectionId) {
-        document.querySelectorAll('.admin-content-sub').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.admin-sub-nav button').forEach(el => el.classList.remove('admin-sub-nav-active'));
+        // Hide all admin subsections
+        const subsections = ['code-gen', 'user-mgmt', 'system-logs', 'system-stats'];
+        subsections.forEach(section => {
+            document.getElementById(`${section}-section`).style.display = 'none';
+        });
 
-        document.querySelector(`#admin-sub-nav button[onclick*='${subSectionId}']`).classList.add('admin-sub-nav-active');
-        document.getElementById(subSectionId + '-section').style.display = 'block';
-        
-        // Auto-fetch data on tab switch
-        if (subSectionId === 'code-gen') fetchCodes(); 
-        if (subSectionId === 'user-mgmt') fetchUsers();
-        if (subSectionId === 'system-logs') fetchLogs();
+        // Reset admin sub navigation
+        document.querySelectorAll('#admin-sub-nav button').forEach(btn => {
+            btn.classList.remove('admin-sub-nav-active');
+        });
+
+        // Show selected subsection
+        document.getElementById(`${subSectionId}-section`).style.display = 'block';
+        document.querySelector(`#admin-sub-nav button[onclick*="${subSectionId}"]`).classList.add('admin-sub-nav-active');
+
+        // Load data for the subsection
+        if (subSectionId === 'code-gen') fetchCodes();
+        else if (subSectionId === 'user-mgmt') fetchUsers();
+        else if (subSectionId === 'system-logs') fetchLogs();
+        else if (subSectionId === 'system-stats') fetchStats();
     }
-    
+
     function toggleAuthView(view) {
+        // Hide all auth forms
         document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'none'; 
-        document.getElementById('verify-form').style.display = 'none'; 
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('verify-form').style.display = 'none';
         document.getElementById('auth-message').style.display = 'none';
 
-        if (view === 'login') { document.getElementById('login-form').style.display = 'block'; } 
-        else if (view === 'register') { document.getElementById('register-form').style.display = 'block'; } 
-        else if (view === 'verify') { document.getElementById('verify-form').style.display = 'block'; }
+        // Show selected form
+        if (view === 'login') {
+            document.getElementById('login-form').style.display = 'block';
+        } else if (view === 'register') {
+            document.getElementById('register-form').style.display = 'block';
+        } else if (view === 'verify') {
+            document.getElementById('verify-form').style.display = 'block';
+        }
     }
 
-
-    async function updateNavAndStatus(user) {
-        const token = getAuthToken();
+    // ===== USER MANAGEMENT FUNCTIONS =====
+    async function updateUserStatus(user = null) {
         const authStatus = document.getElementById('auth-status');
         const planStatus = document.getElementById('plan-status');
         const logoutBtn = document.getElementById('logout-btn');
 
-        if (token && user) {
-            adminData = user; // Store user data globally
-            authStatus.textContent = `Logged in as ${user.username}`;
-            authStatus.classList.remove('user-status-text');
-            authStatus.classList.add('user-premium-text');
+        currentUser = user;
+
+        if (user) {
+            authStatus.textContent = `👤 ${user.username}`;
+            authStatus.className = 'user-premium-text';
             
             const isPremium = user.isPremium && new Date(user.premiumExpiry) > new Date();
-            const planText = isPremium ? `PREMIUM (${user.maxRequestsPerDay}/day)` : `FREE (${user.maxRequestsPerDay}/day)`;
+            const planText = isPremium 
+                ? `💎 PREMIUM (${user.maxRequestsPerDay}/day)` 
+                : `🎯 FREE (${user.maxRequestsPerDay}/day)`;
             
             planStatus.textContent = planText;
             logoutBtn.style.display = 'block';
+
+            // Update result message if user logs in
+            if (document.getElementById('tool-section').style.display !== 'none') {
+                document.getElementById('result').textContent = 'Ready to get likes! Select region and enter UID. 🎮';
+            }
         } else {
-            adminData = null;
-            authStatus.textContent = 'Logged Out';
+            authStatus.textContent = '🔒 Logged Out';
             authStatus.className = 'user-status-text';
-            planStatus.textContent = 'Free (1/day)';
+            planStatus.textContent = '🎯 FREE (1/day)';
             logoutBtn.style.display = 'none';
         }
     }
 
     async function fetchUserInfo() {
         const token = getAuthToken();
-        if (!token) { updateNavAndStatus(null); return; }
+        if (!token) {
+            await updateUserStatus(null);
+            return null;
+        }
 
         try {
-            const response = await fetch(USER_INFO_API, { headers: { 'Authorization': `Bearer ${token}` } });
-            const data = await response.json();
-            
+            const response = await fetch(API_ENDPOINTS.USER_INFO, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
             if (response.ok) {
-                updateNavAndStatus(data);
-                return data;
+                const data = await response.json();
+                await updateUserStatus(data.user);
+                return data.user;
             } else {
-                localStorage.removeItem('jwtToken');
-                updateNavAndStatus(null);
+                // Token is invalid or expired
+                setAuthToken(null);
+                await updateUserStatus(null);
+                return null;
             }
         } catch (error) {
-            localStorage.removeItem('jwtToken');
+            console.error('Fetch user info error:', error);
+            setAuthToken(null);
+            await updateUserStatus(null);
+            return null;
         }
-        return null;
     }
 
-    // --- PACKAGES AND RENDERING LOGIC (RESTORED) ---
-    function populateRegions() {
-        const regionSelect = document.getElementById('region');
-        while (regionSelect.options.length > 1) { regionSelect.remove(1); }
-        REGIONS.forEach(r => {
-            const option = document.createElement('option');
-            option.value = r.value;
-            option.textContent = r.name;
-            regionSelect.appendChild(option);
-        });
-    }
-
-    function renderPackages() { 
-        const listContainer = document.getElementById('package-cards-container');
-        listContainer.innerHTML = '';
-        
-        const weekly = PACKAGES.filter(p => p.type === 'WEEKLY');
-        const monthly = PACKAGES.filter(p => p.type === 'MONTHLY');
-
-        const createSection = (title, pkgs) => {
-             const titleElement = document.createElement('h4');
-             titleElement.textContent = title;
-             titleElement.style.marginTop = '15px';
-             listContainer.appendChild(titleElement);
-             
-             pkgs.forEach((pkg) => {
-                const card = document.createElement('div');
-                card.className = 'package-card';
-                card.innerHTML = `
-                    <p style="font-size: 1.1em; color: #333;"><strong>${pkg.requests} Requests / Day</strong></p>
-                    <p style="color: #d9534f; margin-top: 5px;">Price: <strong>${pkg.price} LKR</strong> / ${pkg.duration}</p>
-                `;
-                card.onclick = () => selectPackage(pkg.id);
-                listContainer.appendChild(card);
-             });
-        };
-        
-        createSection('Weekly Plans', weekly);
-        createSection('Monthly Plans', monthly);
-        document.getElementById('package-list').style.display = 'block';
-    }
-
-    function selectPackage(pkgId) {
-        document.querySelectorAll('.package-card').forEach(card => card.classList.remove('selected'));
-        selectedPackage = PACKAGES.find(pkg => pkg.id === pkgId);
-        
-        if (selectedPackage) {
-            const allCards = document.querySelectorAll('.package-card');
-            for(let card of allCards) {
-                if (card.innerHTML.includes('Requests / Day') && card.innerHTML.includes(selectedPackage.price + ' LKR')) {
-                    card.classList.add('selected');
-                    break;
-                }
+    async function logoutUser() {
+        const token = getAuthToken();
+        if (token) {
+            try {
+                await fetch(API_ENDPOINTS.LOGOUT, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            } catch (error) {
+                console.error('Logout API error:', error);
             }
-            
-            document.getElementById('selected-plan').textContent = `${selectedPackage.requests} Requests / Day (${selectedPackage.duration})`;
-            document.getElementById('selected-price').textContent = `${selectedPackage.price} LKR`;
-            showSection('payment-view');
         }
+
+        setAuthToken(null);
+        await updateUserStatus(null);
+        showSection('auth');
+        showMessage('auth-message', '👋 Logged out successfully', true);
     }
-    
-    async function redeemCode() { /* ... (Logic remains the same) ... */ }
-    function handleErrorResponse(errorMessage, statusCode) { /* ... (Logic remains the same) ... */ }
-    function formatResponseToTextArt(data) { /* ... (Logic remains the same) ... */ }
 
-    // --- ADMIN RENDERING FUNCTIONS (FULL LOGIC) ---
-    function renderUsers(users) { /* ... (Full logic for rendering users table) ... */ }
-    function renderCodes(codes) { /* ... (Full logic for rendering codes table) ... */ }
-    function renderLogs(logs) { /* ... (Full logic for rendering logs table) ... */ }
-    function copyCode(element) { /* ... (Logic remains the same) ... */ }
-    
-    // Data Fetching Functions
-    async function fetchData(api, statusElId, renderFunction) { /* ... (Logic remains the same) ... */ }
-    const fetchUsers = () => fetchData(ADMIN_USERS_API, 'user-status-msg', renderUsers);
-    const fetchCodes = () => fetchData(ADMIN_CODE_REVIEW_API, 'code-review-status-msg', renderCodes);
-    const fetchLogs = () => fetchData(ADMIN_LOGS_API, 'log-status-msg', renderLogs);
-    
-    // Action Handlers
-    window.suspendUser = async (userId, action) => { /* ... (Logic remains the same) ... */ };
-    window.removeCode = async (codeId) => { /* ... (Logic remains the same) ... */ };
-
-
-    // --- FINAL EVENT LISTENERS (CRITICAL FIX FOR FORM SUBMISSIONS) ---
-    
+    // ===== AUTHENTICATION FUNCTIONS =====
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault(); 
-        const deviceId = await getDeviceID(); 
+        e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
+        showLoading(button, true);
+
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
-        const msgId = 'auth-message';
-        
-        showMessage(msgId, 'Processing login...', false);
+        const deviceId = await getDeviceID();
 
         try {
-            const response = await fetch(LOGIN_API, {
+            const response = await fetch(API_ENDPOINTS.LOGIN, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, password: password, deviceId: deviceId }) 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password, deviceId })
             });
 
             const data = await response.json();
 
-            if (response.ok && data.success && data.token) {
-                localStorage.setItem('jwtToken', data.token);
-                showMessage(msgId, data.message + ' Redirecting...', true);
+            if (response.ok && data.success) {
+                setAuthToken(data.token);
+                await fetchUserInfo();
+                showMessage('auth-message', '✅ ' + data.message, true);
                 
-                const userData = await fetchUserInfo(); 
-                if (userData && userData.role === 'admin') {
-                    showSection('admin'); 
+                // Redirect based on user role
+                if (data.user && data.user.role === 'admin') {
+                    setTimeout(() => showSection('admin'), 1000);
                 } else {
-                    showSection('tool'); 
+                    setTimeout(() => showSection('tool'), 1000);
                 }
             } else {
-                showMessage(msgId, data.message || data.error || 'Authentication failed. Check email and password.', false);
+                showMessage('auth-message', '❌ ' + (data.message || data.error || 'Login failed'), false);
             }
         } catch (error) {
-            showMessage(msgId, 'Network error. Could not connect to the server.', false);
+            showMessage('auth-message', '❌ Network error. Please check your connection.', false);
+        } finally {
+            showLoading(button, false);
         }
     });
-    
-    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => { /* ... (Request Code Logic) ... */ });
-    document.getElementById('verifyCodeForm').addEventListener('submit', async (e) => { /* ... (Verify Code Logic) ... */ });
-    document.getElementById('dataForm').addEventListener('submit', async function(event) { /* ... (API Tool logic) ... */ });
-    document.getElementById('generatorForm').addEventListener('submit', async function(e) { /* ... (Admin Generate Code logic) ... */ });
 
+    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
+        showLoading(button, true);
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Initialization
-        await getDeviceID(); 
-        populateRegions(); // 💡 FIX: Populate Regions
-        renderPackages();
-        fetchUserInfo(); 
-        showSection('tool'); // Default to Get Likes view
+        const username = document.getElementById('reg-username').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+        const deviceId = await getDeviceID();
+
+        try {
+            const response = await fetch(API_ENDPOINTS.REQUEST_CODE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email, password, deviceId })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                showMessage('auth-message', '✅ ' + data.message, true);
+                toggleAuthView('verify');
+                document.getElementById('verify-username').value = username;
+            } else {
+                showMessage('auth-message', '❌ ' + (data.message || data.error || 'Registration failed'), false);
+            }
+        } catch (error) {
+            showMessage('auth-message', '❌ Network error. Please try again.', false);
+        } finally {
+            showLoading(button, false);
+        }
     });
+
+    document.getElementById('verifyCodeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
+        showLoading(button, true);
+
+        const username = document.getElementById('verify-username').value;
+        const code = document.getElementById('verify-code').value;
+        const deviceId = await getDeviceID();
+
+        try {
+            const response = await fetch(API_ENDPOINTS.VERIFY_REGISTER, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, code, deviceId })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setAuthToken(data.token);
+                await updateUserStatus(data.user);
+                showMessage('auth-message', '✅ ' + data.message, true);
+                setTimeout(() => showSection('tool'), 1500);
+            } else {
+                showMessage('auth-message', '❌ ' + (data.message || data.error || 'Verification failed'), false);
+            }
+        } catch (error) {
+            showMessage('auth-message', '❌ Network error. Please try again.', false);
+        } finally {
+            showLoading(button, false);
+        }
+    });
+
+    // ===== MAIN TOOL FUNCTION =====
+    document.getElementById('dataForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = document.getElementById('submitBtn');
+        showLoading(button, true);
+
+        const region = document.getElementById('region').value;
+        const uid = document.getElementById('uid').value;
+        const deviceId = await getDeviceID();
+        const token = getAuthToken();
+
+        if (!token) {
+            showMessage('auth-message', '❌ Please login first', false);
+            showSection('auth');
+            showLoading(button, false);
+            return;
+        }
+
+        try {
+            const response = await fetch(API_ENDPOINTS.LIKES, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ region, uid, deviceId })
+            });
+
+            const data = await response.json();
+            const resultElement = document.getElementById('result');
+
+            if (response.ok) {
+                if (data.status === 1) {
+                    resultElement.innerHTML = `
+                        <div style="color: #00ff40;">
+                        ✅ SUCCESS! Likes command executed successfully!
+                        🎮 UID: ${uid} | 🌍 Region: ${region}
+                        ⚡ Response: ${JSON.stringify(data, null, 2)}
+                        </div>
+                    `;
+                    await fetchUserInfo(); // Refresh user info to update request count
+                } else {
+                    resultElement.innerHTML = `
+                        <div style="color: #ff6b6b;">
+                        ❌ Free Fire API Error
+                        📋 Message: ${data.message || 'Unknown error'}
+                        🔧 Status: ${data.status}
+                        </div>
+                    `;
+                }
+            } else {
+                resultElement.innerHTML = `
+                    <div style="color: #ff6b6b;">
+                    ❌ Server Error: ${data.error || 'Unknown error'}
+                    📋 ${data.message || 'Please try again later'}
+                    </div>
+                `;
+            }
+        } catch (error) {
+            document.getElementById('result').innerHTML = `
+                <div style="color: #ff6b6b;">
+                ❌ Network Error: Could not connect to server
+                🔧 ${error.message}
+                </div>
+            `;
+        } finally {
+            showLoading(button, false);
+        }
+    });
+
+    // ===== PREMIUM FUNCTIONS =====
+    function renderPackages() {
+        const container = document.getElementById('package-cards-container');
+        container.innerHTML = '';
+
+        const weeklyPackages = PACKAGES.filter(p => p.type === 'WEEKLY');
+        const monthlyPackages = PACKAGES.filter(p => p.type === 'MONTHLY');
+
+        const createPackageSection = (title, packages) => {
+            const section = document.createElement('div');
+            section.innerHTML = `<h3 style="color: #495057; margin: 20px 0 15px 0; text-align: left;">${title}</h3>`;
+            
+            packages.forEach(pkg => {
+                const card = document.createElement('div');
+                card.className = 'package-card';
+                card.innerHTML = `
+                    <h4>${pkg.requests} Requests/Day</h4>
+                    <div class="price">${pkg.price} LKR</div>
+                    <p style="color: #666; font-size: 0.9em;">Duration: ${pkg.duration}</p>
+                    <p style="color: #999; font-size: 0.8em; margin-top: 8px;">Click to select</p>
+                `;
+                card.onclick = () => selectPackage(pkg);
+                container.appendChild(card);
+            });
+            
+            container.appendChild(section);
+        };
+
+        createPackageSection('📅 Weekly Plans (7 Days)', weeklyPackages);
+        createPackageSection('📊 Monthly Plans (30 Days)', monthlyPackages);
+    }
+
+    function selectPackage(pkg) {
+        selectedPackage = pkg;
+        
+        // Update UI
+        document.querySelectorAll('.package-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Find and select the clicked card
+        const cards = document.querySelectorAll('.package-card');
+        for (let card of cards) {
+            if (card.textContent.includes(`${pkg.requests} Requests/Day`) && 
+                card.textContent.includes(`${pkg.price} LKR`)) {
+                card.classList.add('selected');
+                break;
+            }
+        }
+
+        // Show payment view
+        document.getElementById('selected-plan').textContent = 
+            `${pkg.requests} Requests/Day (${pkg.duration})`;
+        document.getElementById('selected-price').textContent = pkg.price;
+        
+        document.getElementById('package-list').style.display = 'none';
+        document.getElementById('payment-view').style.display = 'block';
+    }
+
+    async function redeemCode() {
+        const codeInput = document.getElementById('premium-code-input');
+        const code = codeInput.value.trim();
+        const statusElement = document.getElementById('redemption-status');
+        const button = document.getElementById('redeem-btn');
+
+        if (!code) {
+            statusElement.innerHTML = '<span style="color: #ff6b6b;">❌ Please enter a premium code</span>';
+            return;
+        }
+
+        const token = getAuthToken();
+        if (!token) {
+            statusElement.innerHTML = '<span style="color: #ff6b6b;">❌ Please login first</span>';
+            showSection('auth');
+            return;
+        }
+
+        button.disabled = true;
+        button.innerHTML = '⏳ Activating...';
+
+        try {
+            const response = await fetch(API_ENDPOINTS.REDEEM, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ code })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                statusElement.innerHTML = `<span style="color: #28a745;">✅ ${data.message}</span>`;
+                codeInput.value = '';
+                await fetchUserInfo(); // Refresh user status
+            } else {
+                statusElement.innerHTML = `<span style="color: #ff6b6b;">❌ ${data.message || data.error || 'Activation failed'}</span>`;
+            }
+        } catch (error) {
+            statusElement.innerHTML = '<span style="color: #ff6b6b;">❌ Network error. Please try again.</span>';
+        } finally {
+            button.disabled = false;
+            button.innerHTML = '✅ Activate Premium Plan';
+        }
+    }
+
+    // ===== ADMIN FUNCTIONS =====
+    async function fetchData(endpoint, containerId, renderFunction) {
+        const token = getAuthToken();
+        if (!token) return;
+
+        try {
+            const response = await fetch(endpoint, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                renderFunction(data);
+            } else {
+                document.getElementById(containerId).innerHTML = 
+                    '<p style="color: #ff6b6b; text-align: center;">❌ Failed to load data</p>';
+            }
+        } catch (error) {
+            document.getElementById(containerId).innerHTML = 
+                '<p style="color: #ff6b6b; text-align: center;">❌ Network error loading data</p>';
+        }
+    }
+
+    function renderUsers(data) {
+        const container = document.getElementById('users-table-container');
+        if (!data.users || data.users.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666;">No users found</p>';
+            return;
+        }
+
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Premium</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.users.forEach(user => {
+            const isPremiumActive = user.isPremium && new Date(user.premiumExpiry) > new Date();
+            html += `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>${isPremiumActive ? '💎 Yes' : '❌ No'}</td>
+                    <td>${user.isSuspended ? '🔴 Suspended' : '🟢 Active'}</td>
+                    <td>
+                        <button onclick="suspendUser('${user.id}', ${!user.isSuspended})" 
+                                style="padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; 
+                                       background: ${user.isSuspended ? '#28a745' : '#dc3545'}; color: white;">
+                            ${user.isSuspended ? 'Activate' : 'Suspend'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    function renderCodes(data) {
+        const container = document.getElementById('code-review-table-container');
+        if (!data.codes || data.codes.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666;">No codes found</p>';
+            return;
+        }
+
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Requests/Day</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Used By</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.codes.forEach(code => {
+            html += `
+                <tr>
+                    <td><code>${code.code}</code></td>
+                    <td>${code.maxRequestsPerDay}</td>
+                    <td>${code.durationDays} days</td>
+                    <td>${code.isUsed ? '🔴 Used' : '🟢 Active'}</td>
+                    <td>${code.usedBy ? code.usedBy.username : '-'}</td>
+                    <td>${new Date(code.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        ${!code.isUsed ? `
+                        <button onclick="removeCode('${code.id}')" 
+                                style="padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; 
+                                       background: #dc3545; color: white;">
+                            Remove
+                        </button>
+                        ` : '-'}
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    function renderLogs(data) {
+        const container = document.getElementById('logs-table-container');
+        if (!data.logs || data.logs.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #666;">No logs found</p>';
+            return;
+        }
+
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Endpoint</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        data.logs.forEach(log => {
+            html += `
+                <tr>
+                    <td>${log.user.username || log.user}</td>
+                    <td>${log.endpoint}</td>
+                    <td>${log.status}</td>
+                    <td title="${log.details}">${log.details.substring(0, 50)}...</td>
+                    <td>${new Date(log.timestamp).toLocaleString()}</td>
+                </tr>
+            `;
+        });
+
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    function renderStats(data) {
+        const container = document.getElementById('stats-container');
+        if (!data.stats) {
+            container.innerHTML = '<p style="text-align: center; color: #666;">No statistics available</p>';
+            return;
+        }
+
+        const stats = data.stats;
+        container.innerHTML = `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style="color: #1976d2; margin: 0 0 10px 0;">👥 Total Users</h4>
+                    <p style="font-size: 2em; font-weight: bold; color: #1976d2; margin: 0;">${stats.users.total}</p>
+                </div>
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style="color: #388e3c; margin: 0 0 10px 0;">💎 Premium Users</h4>
+                    <p style="font-size: 2em; font-weight: bold; color: #388e3c; margin: 0;">${stats.users.premium}</p>
+                </div>
+                <div style="background: #fff3e0; padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style="color: #f57c00; margin: 0 0 10px 0;">🎫 Available Codes</h4>
+                    <p style="font-size: 2em; font-weight: bold; color: #f57c00; margin: 0;">${stats.codes.available}</p>
+                </div>
+                <div style="background: #fce4ec; padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style="color: #c2185b; margin: 0 0 10px 0;">📊 Today's Requests</h4>
+                    <p style="font-size: 2em; font-weight: bold; color: #c2185b; margin: 0;">${stats.activity.todayRequests}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Admin action functions
+    window.suspendUser = async (userId, suspend) => {
+        if (!confirm(`Are you sure you want to ${suspend ? 'suspend' : 'activate'} this user?`)) {
+            return;
+        }
+
+        const token = getAuthToken();
+        try {
+            const response = await fetch(API_ENDPOINTS.ADMIN_SUSPEND, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ userId, suspend })
+            });
+
+            if (response.ok) {
+                alert('User status updated successfully!');
+                fetchUsers();
+            } else {
+                alert('Failed to update user status');
+            }
+        } catch (error) {
+            alert('Network error updating user status');
+        }
+    };
+
+    window.removeCode = async (codeId) => {
+        if (!confirm('Are you sure you want to remove this code?')) {
+            return;
+        }
+
+        const token = getAuthToken();
+        try {
+            const response = await fetch(API_ENDPOINTS.ADMIN_REMOVE_CODE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ codeId })
+            });
+
+            if (response.ok) {
+                alert('Code removed successfully!');
+                fetchCodes();
+            } else {
+                alert('Failed to remove code');
+            }
+        } catch (error) {
+            alert('Network error removing code');
+        }
+    };
+
+    // Code generation form
+    document.getElementById('generatorForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = e.target.querySelector('button[type="submit"]');
+        showLoading(button, true);
+
+        const requests = document.getElementById('requests').value;
+        const days = document.getElementById('days').value;
+        const token = getAuthToken();
+
+        try {
+            const response = await fetch(API_ENDPOINTS.ADMIN_GENERATE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ requests, days })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                const codeBox = document.getElementById('code-output-box');
+                document.getElementById('generatedCode').textContent = data.code.value;
+                document.getElementById('limitValue').textContent = data.code.maxRequestsPerDay;
+                document.getElementById('daysValue').textContent = data.code.durationDays;
+                codeBox.style.display = 'block';
+                
+                // Refresh codes list
+                fetchCodes();
+            } else {
+                alert('Failed to generate code: ' + (data.message || data.error));
+            }
+        } catch (error) {
+            alert('Network error generating code');
+        } finally {
+            showLoading(button, false);
+        }
+    });
+
+    // Copy code function
+    window.copyCode = function(element) {
+        const text = element.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = element.textContent;
+            element.textContent = '✅ Copied!';
+            setTimeout(() => {
+                element.textContent = originalText;
+            }, 2000);
+        });
+    };
+
+    // Data fetching functions
+    window.fetchUsers = () => fetchData(API_ENDPOINTS.ADMIN_USERS, 'users-table-container', renderUsers);
+    window.fetchCodes = () => fetchData(API_ENDPOINTS.ADMIN_CODES, 'code-review-table-container', renderCodes);
+    window.fetchLogs = () => fetchData(API_ENDPOINTS.ADMIN_LOGS, 'logs-table-container', renderLogs);
+    window.fetchStats = () => fetchData(API_ENDPOINTS.ADMIN_STATS, 'stats-container', renderStats);
+
+    // ===== INITIALIZATION =====
+    function populateRegions() {
+        const regionSelect = document.getElementById('region');
+        regionSelect.innerHTML = '<option value="">-- Choose Your Region --</option>';
+        
+        REGIONS.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region.value;
+            option.textContent = region.name;
+            regionSelect.appendChild(option);
+        });
+    }
+
+    async function initializeApp() {
+        console.log('🚀 Initializing Free Fire Likes System...');
+        
+        // Get device ID
+        await getDeviceID();
+        
+        // Populate regions
+        populateRegions();
+        
+        // Render packages
+        renderPackages();
+        
+        // Check if user is logged in
+        await fetchUserInfo();
+        
+        // Show appropriate section
+        if (currentUser && currentUser.role === 'admin') {
+            showSection('admin');
+        } else {
+            showSection('tool');
+        }
+        
+        console.log('✅ App initialized successfully');
+    }
+
+    // Start the application when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initializeApp);
 </script>
 
 </body>
