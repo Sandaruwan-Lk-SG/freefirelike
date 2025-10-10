@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Likes System - Premium Dashboard</title>
+    <title>Free Fire Likes System - Railway</title>
     
     <!-- FingerprintJS for device identification -->
     <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script> 
@@ -477,6 +477,19 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #c9302c;
         }
+
+        /* ===== CONNECTION STATUS ===== */
+        #connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10000;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -484,6 +497,11 @@
 <!-- Admin Access Bar -->
 <div id="admin-link-bar">
     <a href="#" onclick="showSection('admin')">🔧 ADMIN PANEL</a>
+</div>
+
+<!-- Connection Status Indicator -->
+<div id="connection-status">
+    🔄 Checking...
 </div>
 
 <!-- Main Container -->
@@ -788,9 +806,14 @@
 
 <!-- ===== JAVASCRIPT ===== -->
 <script>
-    // ===== CONFIGURATION =====
-    const BASE_URL = window.location.origin; // Auto-detect backend URL
+    // ===== RAILWAY CONFIGURATION =====
+    const RAILWAY_BACKEND_URL = 'https://freefirewebbackend-production.up.railway.app';
+    const BASE_URL = RAILWAY_BACKEND_URL;
+
+    console.log('🚂 Railway Backend URL:', BASE_URL);
+
     const API_ENDPOINTS = {
+        HEALTH: `${BASE_URL}/health`,
         LOGIN: `${BASE_URL}/api/login`,
         REQUEST_CODE: `${BASE_URL}/api/request-code`,
         VERIFY_REGISTER: `${BASE_URL}/api/verify-and-register`,
@@ -798,7 +821,6 @@
         REDEEM: `${BASE_URL}/api/redeem`,
         USER_INFO: `${BASE_URL}/api/user-info`,
         LOGOUT: `${BASE_URL}/api/logout`,
-        HEALTH: `${BASE_URL}/api/health`,
         
         // Admin endpoints
         ADMIN_GENERATE: `${BASE_URL}/api/admin/generate-code`,
@@ -857,6 +879,12 @@
     let currentUser = null;
     let selectedPackage = null;
     let deviceId = null;
+
+    // Connection monitoring
+    let connectionStatus = {
+        isOnline: navigator.onLine,
+        backendOnline: false
+    };
 
     // ===== UTILITY FUNCTIONS =====
     function getAuthToken() {
@@ -921,6 +949,102 @@
             return deviceId;
         }
     }
+
+    // ===== CONNECTION MONITORING =====
+    function updateConnectionStatus() {
+        const statusElement = document.getElementById('connection-status');
+        if (!statusElement) return;
+
+        if (!connectionStatus.isOnline) {
+            statusElement.style.display = 'block';
+            statusElement.style.background = '#ff6b6b';
+            statusElement.style.color = 'white';
+            statusElement.textContent = '🔴 Offline';
+        } else if (!connectionStatus.backendOnline) {
+            statusElement.style.display = 'block';
+            statusElement.style.background = '#ffa726';
+            statusElement.style.color = 'white';
+            statusElement.textContent = '🟡 Backend Offline';
+        } else {
+            statusElement.style.display = 'block';
+            statusElement.style.background = '#66bb6a';
+            statusElement.style.color = 'white';
+            statusElement.textContent = '🟢 Online';
+            // Hide after 3 seconds if everything is OK
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    // Enhanced connection test
+    async function testBackendConnection() {
+        try {
+            console.log('🔍 Testing Railway backend connection...');
+            
+            // Create abort controller for timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(API_ENDPOINTS.HEALTH, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Railway backend connected:', data);
+                connectionStatus.backendOnline = true;
+                updateConnectionStatus();
+                return true;
+            } else {
+                console.error('❌ Backend health check failed:', response.status, response.statusText);
+                connectionStatus.backendOnline = false;
+                updateConnectionStatus();
+                return false;
+            }
+        } catch (error) {
+            console.error('❌ Cannot connect to Railway backend:', error.message);
+            connectionStatus.backendOnline = false;
+            updateConnectionStatus();
+            
+            // Show detailed error message
+            const resultElement = document.getElementById('result');
+            if (resultElement) {
+                resultElement.innerHTML = `
+                    <div style="color: #ff6b6b; text-align: center; padding: 20px;">
+                        <h3>❌ Backend Connection Failed</h3>
+                        <p><strong>URL:</strong> ${BASE_URL}</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>💡 Please check:</p>
+                        <ul style="text-align: left; display: inline-block;">
+                            <li>Railway deployment status</li>
+                            <li>Environment variables</li>
+                            <li>MongoDB connection</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            return false;
+        }
+    }
+
+    // Network status monitoring
+    window.addEventListener('online', () => {
+        connectionStatus.isOnline = true;
+        updateConnectionStatus();
+        testBackendConnection();
+    });
+
+    window.addEventListener('offline', () => {
+        connectionStatus.isOnline = false;
+        updateConnectionStatus();
+    });
 
     // ===== UI MANAGEMENT FUNCTIONS =====
     function showSection(sectionId) {
@@ -1088,9 +1212,11 @@
 
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
-        const deviceId = await getDeviceID();
-
+        
         try {
+            const deviceId = await getDeviceID();
+            console.log('📱 Device ID:', deviceId);
+
             const response = await fetch(API_ENDPOINTS.LOGIN, {
                 method: 'POST',
                 headers: {
@@ -1099,7 +1225,18 @@
                 body: JSON.stringify({ email, password, deviceId })
             });
 
+            console.log('🔐 Login Response Status:', response.status);
+
+            // Handle non-JSON responses
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('❌ Non-JSON response:', text);
+                throw new Error(`Server returned ${response.status}: ${text.substring(0, 100)}`);
+            }
+
             const data = await response.json();
+            console.log('🔐 Login Response Data:', data);
 
             if (response.ok && data.success) {
                 setAuthToken(data.token);
@@ -1116,7 +1253,20 @@
                 showMessage('auth-message', '❌ ' + (data.message || data.error || 'Login failed'), false);
             }
         } catch (error) {
-            showMessage('auth-message', '❌ Network error. Please check your connection.', false);
+            console.error('🔐 Login Error Details:', error);
+            
+            let errorMessage = 'Network error. Please check your connection.';
+            
+            // More specific error messages
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                errorMessage = 'Cannot connect to server. Check if backend is running on Railway.';
+            } else if (error.message.includes('NetworkError')) {
+                errorMessage = 'Network error. Check your internet connection.';
+            } else {
+                errorMessage = error.message || 'An unexpected error occurred.';
+            }
+            
+            showMessage('auth-message', '❌ ' + errorMessage, false);
         } finally {
             showLoading(button, false);
         }
@@ -1684,7 +1834,10 @@
     }
 
     async function initializeApp() {
-        console.log('🚀 Initializing Free Fire Likes System...');
+        console.log('🚀 Initializing Free Fire Likes System for Railway...');
+        
+        // Initialize connection status
+        updateConnectionStatus();
         
         // Get device ID
         await getDeviceID();
@@ -1694,6 +1847,9 @@
         
         // Render packages
         renderPackages();
+        
+        // Test backend connection
+        await testBackendConnection();
         
         // Check if user is logged in
         await fetchUserInfo();
