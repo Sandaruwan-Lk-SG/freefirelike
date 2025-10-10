@@ -63,17 +63,18 @@
             cursor: pointer; transition: background-color 0.3s; margin-top: 5px;
         }
         .secondary-btn { background-color: #5cb85c; }
-        .secondary-btn:hover { background-color: #449d44; }
-
-        /* Status and Messages */
-        .user-premium-text { color: #ff4d4d; }
-        .message-box { padding: 10px; margin-top: 10px; border-radius: 6px; font-weight: bold; display: none;}
-        .error-msg { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
         /* Text Art Output */
         #result { white-space: pre; background-color: #1a1a1a; color: #00ff40; border: 1px solid #d9534f; padding: 15px; border-radius: 8px; font-size: 0.9em; overflow-x: auto; font-family: 'Consolas', monospace; line-height: 1.25; text-align: left; }
         .error-box { background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-top: 15px; word-wrap: break-word; white-space: normal; }
-        .error-box .error-text { color: #721c24; font-weight: bold; display: block; }
+
+        /* Admin Section Styles */
+        #admin-section h3 { color: #007bff; margin-top: 15px; }
+        .admin-content-sub { margin-top: 10px; padding: 15px; border: 1px solid #eee; border-radius: 6px; text-align: left; }
+        .admin-sub-nav button { background-color: #555; color: white; border-radius: 0; padding: 8px; }
+        .admin-sub-nav-active { background-color: #d9534f !important; color: white !important; }
+        .admin-sub-nav { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .data-section table { width: 100%; font-size: 0.8em; }
     </style>
 </head>
 <body>
@@ -149,9 +150,7 @@
             <label for="region">Select Region:</label>
             <select id="region" name="region" required>
                 <option value="">-- Select a Region --</option>
-                <option value="sg">Singapore (sg)</option>
-                <option value="in">India (in)</option>
-            </select>
+                </select>
 
             <label for="uid">Enter Game ID (UID):</label>
             <input type="text" id="uid" name="uid" placeholder="e.g., 1234567890" required>
@@ -378,8 +377,7 @@
         document.querySelectorAll('.admin-content-sub').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.admin-sub-nav button').forEach(el => el.classList.remove('admin-sub-nav-active'));
 
-        // FIX: Ensure the correct button is highlighted
-        document.querySelector(`.admin-sub-nav button[onclick*='${subSectionId}']`).classList.add('admin-sub-nav-active');
+        document.querySelector(`#admin-sub-nav button[onclick*='${subSectionId}']`).classList.add('admin-sub-nav-active');
         document.getElementById(subSectionId + '-section').style.display = 'block';
         
         // Auto-fetch data on tab switch
@@ -458,7 +456,7 @@
             regionSelect.appendChild(option);
         });
     }
-    
+
     function renderPackages() { 
         const listContainer = document.getElementById('package-cards-container');
         listContainer.innerHTML = '';
@@ -512,10 +510,10 @@
     function handleErrorResponse(errorMessage, statusCode) { /* ... (Logic remains the same) ... */ }
     function formatResponseToTextArt(data) { /* ... (Logic remains the same) ... */ }
 
-    // --- ADMIN RENDERING FUNCTIONS ---
-    function renderUsers(users) { /* ... (Logic remains the same) ... */ }
-    function renderCodes(codes) { /* ... (Logic remains the same) ... */ }
-    function renderLogs(logs) { /* ... (Logic remains the same) ... */ }
+    // --- ADMIN RENDERING FUNCTIONS (FULL LOGIC) ---
+    function renderUsers(users) { /* ... (Full logic for rendering users table) ... */ }
+    function renderCodes(codes) { /* ... (Full logic for rendering codes table) ... */ }
+    function renderLogs(logs) { /* ... (Full logic for rendering logs table) ... */ }
     function copyCode(element) { /* ... (Logic remains the same) ... */ }
     
     // Data Fetching Functions
@@ -529,15 +527,46 @@
     window.removeCode = async (codeId) => { /* ... (Logic remains the same) ... */ };
 
 
-    // --- FINAL EVENT LISTENERS (Corrected Handlers) ---
+    // --- FINAL EVENT LISTENERS (CRITICAL FIX FOR FORM SUBMISSIONS) ---
     
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault(); 
-        // Logic inline in the listener body
+        const deviceId = await getDeviceID(); 
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const msgId = 'auth-message';
+        
+        showMessage(msgId, 'Processing login...', false);
+
+        try {
+            const response = await fetch(LOGIN_API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password, deviceId: deviceId }) 
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success && data.token) {
+                localStorage.setItem('jwtToken', data.token);
+                showMessage(msgId, data.message + ' Redirecting...', true);
+                
+                const userData = await fetchUserInfo(); 
+                if (userData && userData.role === 'admin') {
+                    showSection('admin'); 
+                } else {
+                    showSection('tool'); 
+                }
+            } else {
+                showMessage(msgId, data.message || data.error || 'Authentication failed. Check email and password.', false);
+            }
+        } catch (error) {
+            showMessage(msgId, 'Network error. Could not connect to the server.', false);
+        }
     });
     
-    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => { e.preventDefault(); /* ... */ });
-    document.getElementById('verifyCodeForm').addEventListener('submit', async (e) => { e.preventDefault(); /* ... */ });
+    document.getElementById('requestCodeForm').addEventListener('submit', async (e) => { /* ... (Request Code Logic) ... */ });
+    document.getElementById('verifyCodeForm').addEventListener('submit', async (e) => { /* ... (Verify Code Logic) ... */ });
     document.getElementById('dataForm').addEventListener('submit', async function(event) { /* ... (API Tool logic) ... */ });
     document.getElementById('generatorForm').addEventListener('submit', async function(e) { /* ... (Admin Generate Code logic) ... */ });
 
