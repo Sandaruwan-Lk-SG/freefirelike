@@ -490,6 +490,31 @@
             z-index: 10000;
             display: none;
         }
+
+        /* ===== MODAL STYLES ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -521,6 +546,7 @@
         <button id="tab-auth" onclick="showSection('auth')">🔐 Login/Register</button>
         <button id="tab-tool" onclick="showSection('tool')" class="nav-active">⚡ Get Likes</button>
         <button id="tab-premium" onclick="showSection('premium')">💎 Premium</button>
+        <button id="tab-account" onclick="showSection('account')">👤 Account</button>
         <button id="tab-admin" onclick="showSection('admin')">🔧 Admin</button>
     </div>
 
@@ -702,6 +728,30 @@
             <p id="redemption-status" style="margin-top: 15px; padding: 10px; border-radius: 8px;"></p>
         </div>
     </div>
+
+    <!-- ===== ACCOUNT MANAGEMENT SECTION ===== -->
+    <div id="account-section" style="display: none;">
+        <h2>👤 Account Management</h2>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3 style="color: #d9534f; margin-bottom: 15px;">Account Information</h3>
+            
+            <div id="account-details" style="text-align: left; margin-bottom: 20px;">
+                <!-- Account details will be populated by JavaScript -->
+            </div>
+
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #856404;">⚠️ Danger Zone</h4>
+                <p style="margin-bottom: 15px;">These actions are irreversible. Please proceed with caution.</p>
+                
+                <button onclick="showDeleteConfirmation()" class="action-button" style="background: linear-gradient(45deg, #dc3545, #c82333);">
+                    🗑️ Delete My Account
+                </button>
+            </div>
+        </div>
+
+        <button onclick="showSection('tool')" class="action-button">← Back to Main</button>
+    </div>
     
     <!-- ===== ADMIN SECTION ===== -->
     <div id="admin-section" style="display: none;">
@@ -787,6 +837,179 @@
         </div>
     </div>
 
+    <!-- ===== PRIVACY POLICY SECTION ===== -->
+    <div id="privacy-section" style="display: none;">
+        <h2>🔒 Privacy Policy</h2>
+        
+        <div style="text-align: left; max-height: 400px; overflow-y: auto; padding: 20px; background: #f8f9fa; border-radius: 10px; margin: 20px 0;">
+            <h3 style="color: #d9534f; margin-bottom: 15px;">Free Fire Likes System Privacy Policy</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <h4>1. Information We Collect</h4>
+                <p>We collect the following information to provide our services:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Email address for account verification</li>
+                    <li>Username for account identification</li>
+                    <li>Device fingerprint for security purposes</li>
+                    <li>IP address for security monitoring</li>
+                    <li>Free Fire UID for likes service</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>2. How We Use Your Information</h4>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>To provide Free Fire likes service</li>
+                    <li>To prevent fraud and multi-account abuse</li>
+                    <li>To send verification codes and service updates</li>
+                    <li>To improve our service quality</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>3. Data Security</h4>
+                <p>We implement security measures including:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Password encryption using bcrypt</li>
+                    <li>Security  token authentication</li>
+                    <li>fingerprint verification</li>
+                    <li>rate limiting</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>4. Data Retention</h4>
+                <p>We retain your data only as long as necessary:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Account data: Until account deletion</li>
+                    <li>Activity logs: 30 days</li>
+                    <li>Verification codes: 10 minutes</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>5. Your Rights</h4>
+                <p>You have the right to:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Access your personal data</li>
+                    <li>Correct inaccurate data</li>
+                    <li>Delete your account and data</li>
+                    <li>Export your data</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>6. Third-Party Services</h4>
+                <p>We use:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>for email delivery</li>
+                    <li>for data storage</li>
+                    <li>for hosting</li>
+                </ul>
+            </div>
+
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Contact Information:</strong></p>
+                <p>Email: wosandaruwanjayalath@gmail.com</p>
+                <p>Last Updated: <span id="privacy-update-date"></span></p>
+            </div>
+        </div>
+
+        <button onclick="showSection('tool')" class="action-button">← Back to Main</button>
+    </div>
+
+    <!-- ===== TERMS AND CONDITIONS SECTION ===== -->
+    <div id="terms-section" style="display: none;">
+        <h2>📝 Terms and Conditions</h2>
+        
+        <div style="text-align: left; max-height: 400px; overflow-y: auto; padding: 20px; background: #f8f9fa; border-radius: 10px; margin: 20px 0;">
+            <h3 style="color: #d9534f; margin-bottom: 15px;">Free Fire Likes System - Terms of Service</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <h4>1. Acceptance of Terms</h4>
+                <p>By using our service, you agree to these terms and conditions.</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>2. Service Description</h4>
+                <p>We provide Free Fire likes service through official API integration. This is a third-party service not affiliated with Garena.</p>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>3. User Responsibilities</h4>
+                <p>You agree to:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Provide accurate information</li>
+                    <li>Maintain account security</li>
+                    <li>Not create multiple accounts</li>
+                    <li>Not use automated scripts</li>
+                    <li>Not attempt to hack or disrupt service</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>4. Prohibited Activities</h4>
+                <p>Strictly prohibited:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Multi-account creation</li>
+                    <li>API abuse or scraping</li>
+                    <li>Reverse engineering</li>
+                    <li>Fraudulent payments</li>
+                    <li>Spamming other users</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>5. Payment and Refunds</h4>
+                <p>Premium services:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>All payments are final</li>
+                    <li>No refunds for used codes</li>
+                    <li>Prices subject to change</li>
+                    <li>Contact admin for payment issues</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>6. Account Suspension</h4>
+                <p>We may suspend accounts for:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Terms violation</li>
+                    <li>Suspicious activity</li>
+                    <li>Payment disputes</li>
+                    <li>Security concerns</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>7. Limitation of Liability</h4>
+                <p>We are not responsible for:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Free Fire account issues</li>
+                    <li>Service interruptions</li>
+                    <li>Third-party system  changes</li>
+                    <li>User errors or misuse</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4>8. Service Availability</h4>
+                <p>Service provided "as is" without warranties. We may:</p>
+                <ul style="margin-left: 20px; margin-bottom: 15px;">
+                    <li>Perform maintenance downtime</li>
+                    <li>Update features without notice</li>
+                    <li>Discontinue service with notice</li>
+                </ul>
+            </div>
+
+            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p><strong>⚠️ Important:</strong> This service is not affiliated with Garena International. Free Fire is a registered trademark of Garena International.</p>
+            </div>
+        </div>
+
+        <button onclick="showSection('tool')" class="action-button">← Back to Main</button>
+    </div>
+
     <!-- ===== CONTACT SECTION ===== -->
     <div class="contact-section">
         <h2>📞 Contact & Support</h2>
@@ -800,6 +1023,38 @@
             <p><strong>📱 Mobile:</strong> 0762332957 
                 <small style="color: #666;">(Available 6:00 PM - 9:00 PM on weekdays)</small>
             </p>
+        </div>
+    </div>
+
+    <!-- ===== LEGAL LINKS ===== -->
+    <div style="margin-top: 20px; padding: 15px; text-align: center; border-top: 1px solid #e9ecef;">
+        <p style="color: #666; font-size: 0.9em;">
+            <a href="#" onclick="showSection('privacy')" style="color: #007bff; text-decoration: none; margin: 0 10px;">Privacy Policy</a> • 
+            <a href="#" onclick="showSection('terms')" style="color: #007bff; text-decoration: none; margin: 0 10px;">Terms & Conditions</a> • 
+            <a href="#" onclick="showSection('account')" style="color: #007bff; text-decoration: none; margin: 0 10px;">Account Settings</a>
+        </p>
+        <p style="color: #999; font-size: 0.8em; margin-top: 10px;">
+            &copy; 2024 Free Fire Likes System. Not affiliated with Garena.
+        </p>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-confirmation" class="modal-overlay">
+    <div class="modal-content">
+        <h3 style="color: #dc3545; margin-bottom: 15px;">🗑️ Confirm Account Deletion</h3>
+        <p style="margin-bottom: 20px; color: #666;">This action cannot be undone. All your data will be permanently deleted.</p>
+        
+        <div style="margin-bottom: 20px;">
+            <label for="delete-confirm-email" style="display: block; text-align: left; margin-bottom: 8px; font-weight: bold;">Enter your email to confirm:</label>
+            <input type="email" id="delete-confirm-email" placeholder="your@email.com" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 8px;">
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button onclick="hideDeleteConfirmation()" class="action-button secondary-btn" style="flex: 1;">Cancel</button>
+            <button onclick="deleteUserAccount()" class="action-button" style="flex: 1; background: linear-gradient(45deg, #dc3545, #c82333);">
+                Delete Account
+            </button>
         </div>
     </div>
 </div>
@@ -821,6 +1076,7 @@
         REDEEM: `${BASE_URL}/api/redeem`,
         USER_INFO: `${BASE_URL}/api/user-info`,
         LOGOUT: `${BASE_URL}/api/logout`,
+        DELETE_ACCOUNT: `${BASE_URL}/api/delete-account`,
         
         // Admin endpoints
         ADMIN_GENERATE: `${BASE_URL}/api/admin/generate-code`,
@@ -1049,9 +1305,10 @@
     // ===== UI MANAGEMENT FUNCTIONS =====
     function showSection(sectionId) {
         // Hide all sections
-        const sections = ['auth', 'tool', 'premium', 'admin'];
+        const sections = ['auth', 'tool', 'premium', 'admin', 'account', 'privacy', 'terms'];
         sections.forEach(section => {
-            document.getElementById(`${section}-section`).style.display = 'none';
+            const element = document.getElementById(`${section}-section`);
+            if (element) element.style.display = 'none';
         });
 
         // Reset navigation
@@ -1060,8 +1317,16 @@
         });
 
         // Show selected section
-        document.getElementById(`${sectionId}-section`).style.display = 'block';
-        document.getElementById(`tab-${sectionId}`).classList.add('nav-active');
+        const targetSection = document.getElementById(`${sectionId}-section`);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+
+        // Update navigation for main sections only
+        const tabElement = document.getElementById(`tab-${sectionId}`);
+        if (tabElement) {
+            tabElement.classList.add('nav-active');
+        }
 
         // Special handling for specific sections
         if (sectionId === 'auth') {
@@ -1075,6 +1340,10 @@
                 showSection('auth');
                 showMessage('auth-message', '🔒 Admin access required. Please login as administrator.', false);
             }
+        } else if (sectionId === 'account') {
+            updateAccountDetails();
+        } else if (sectionId === 'privacy') {
+            document.getElementById('privacy-update-date').textContent = new Date().toLocaleDateString();
         }
     }
 
@@ -1116,6 +1385,93 @@
         } else if (view === 'verify') {
             document.getElementById('verify-form').style.display = 'block';
         }
+    }
+
+    // ===== ACCOUNT MANAGEMENT FUNCTIONS =====
+    function showDeleteConfirmation() {
+        document.getElementById('delete-confirmation').style.display = 'flex';
+    }
+
+    function hideDeleteConfirmation() {
+        document.getElementById('delete-confirmation').style.display = 'none';
+        document.getElementById('delete-confirm-email').value = '';
+    }
+
+    async function deleteUserAccount() {
+        const email = document.getElementById('delete-confirm-email').value;
+        const userEmail = currentUser?.email;
+
+        if (!email || email !== userEmail) {
+            alert('Please enter your exact email address to confirm deletion.');
+            return;
+        }
+
+        if (!confirm('FINAL WARNING: This will permanently delete your account and all data. This action cannot be undone!')) {
+            return;
+        }
+
+        const token = getAuthToken();
+        if (!token) {
+            alert('Please login to delete your account.');
+            return;
+        }
+
+        try {
+            const response = await fetch(API_ENDPOINTS.DELETE_ACCOUNT, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                alert('Account deleted successfully.');
+                setAuthToken(null);
+                await updateUserStatus(null);
+                showSection('auth');
+                hideDeleteConfirmation();
+            } else {
+                alert('Failed to delete account: ' + (data.message || data.error));
+            }
+        } catch (error) {
+            alert('Network error. Please try again.');
+        }
+    }
+
+    async function updateAccountDetails() {
+        if (!currentUser) {
+            showSection('auth');
+            return;
+        }
+
+        const accountDetails = document.getElementById('account-details');
+        const isPremiumActive = currentUser.isPremium && new Date(currentUser.premiumExpiry) > new Date();
+        
+        accountDetails.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                <div style="background: white; padding: 15px; border-radius: 8px;">
+                    <strong>Username:</strong><br>${currentUser.username}
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px;">
+                    <strong>Email:</strong><br>${currentUser.email}
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px;">
+                    <strong>Account Type:</strong><br>${currentUser.role === 'admin' ? '👑 Administrator' : (isPremiumActive ? '💎 Premium' : '🎯 Free')}
+                </div>
+                <div style="background: white; padding: 15px; border-radius: 8px;">
+                    <strong>Daily Limit:</strong><br>${currentUser.maxRequestsPerDay} requests
+                </div>
+            </div>
+            ${isPremiumActive ? `
+                <div style="background: #d4edda; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                    <strong>Premium Status:</strong> Active until ${new Date(currentUser.premiumExpiry).toLocaleDateString()}
+                </div>
+            ` : ''}
+        `;
     }
 
     // ===== USER MANAGEMENT FUNCTIONS =====
